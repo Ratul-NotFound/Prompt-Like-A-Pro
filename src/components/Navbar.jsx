@@ -1,36 +1,18 @@
 import React from 'react';
-import { Settings, BookOpen, History, Github, Terminal, Sliders } from 'lucide-react';
+import { Settings, BookOpen, History, Github } from 'lucide-react';
 
-export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey, sidebarOpen, onToggleSidebar }) {
+export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey }) {
   return (
     <header className="navbar-container">
       <div className="navbar-inner">
-        {/* Modern Developer-style Brand Logo */}
+        {/* Clean Minimalist Brand Logo */}
         <div className="brand-group">
-          <div className="brand-logo-icon">
-            <Terminal size={12} className="logo-svg" />
-          </div>
-          <span className="brand-title">PROMPT</span>
-          <span className="brand-badge">PRO</span>
-          
-          <div className="status-indicator">
-            <span className={`status-dot ${hasApiKey ? 'active' : ''}`} />
-            <span className="status-text">{hasApiKey ? 'Gemini AI Active' : 'Local Sandbox'}</span>
-          </div>
+          <span className="brand-dot" />
+          <span className="brand-title">PROMPT LIKE A PRO</span>
         </div>
 
-        {/* Premium Capsule Navigation Links */}
+        {/* Minimalist Navigation Actions */}
         <div className="navbar-actions">
-          {/* Collapsible parameters panel toggle button */}
-          <button 
-            className={`nav-link-btn tuner-toggle ${sidebarOpen ? 'active' : ''}`}
-            onClick={onToggleSidebar}
-            title={sidebarOpen ? "Hide Tuner Panel" : "Show Tuner Panel"}
-          >
-            <Sliders size={13} />
-            <span>Tuner</span>
-          </button>
-
           <button 
             className="nav-link-btn"
             onClick={onOpenGuide}
@@ -50,7 +32,7 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           </button>
 
           <button 
-            className="nav-link-btn settings-trigger"
+            className="nav-link-btn"
             onClick={onOpenSettings}
             title="API Settings"
           >
@@ -60,6 +42,15 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
 
           <div className="nav-divider" />
 
+          {/* Minimal Status Dot on the right */}
+          <div 
+            className={`engine-status-tag ${hasApiKey ? 'active' : ''}`}
+            title={hasApiKey ? 'Gemini AI API Connected' : 'Local Heuristic Engine'}
+          >
+            <span className="status-dot-core" />
+            <span className="status-dot-label">{hasApiKey ? 'GEMINI' : 'LOCAL'}</span>
+          </div>
+
           <a 
             href="https://github.com/Ratul-NotFound/Prompt-Like-A-Pro"
             target="_blank"
@@ -67,7 +58,7 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
             className="github-nav-link"
             title="GitHub Repository"
           >
-            <Github size={15} />
+            <Github size={14} />
           </a>
         </div>
       </div>
@@ -78,150 +69,113 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           top: 0;
           z-index: 900;
           width: 100%;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          background: rgba(11, 12, 16, 0.85);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          background: #0B0C10; /* Merges completely with the main page background */
         }
 
         .navbar-inner {
-          max-width: 840px;
+          max-width: 840px; /* Centered chat canvas alignment */
           margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem 1.25rem;
-          transition: max-width 0.2s ease;
-        }
-
-        /* Expand header width dynamically when sidebar layout is visible */
-        .navbar-container:has(+ main .has-sidebar) .navbar-inner {
-          max-width: 1200px;
+          padding: 1.15rem 1.25rem;
         }
 
         .brand-group {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.55rem;
         }
 
-        .brand-logo-icon {
-          width: 22px;
-          height: 22px;
-          border-radius: 6px;
+        .brand-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
           background: #FFFFFF;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .logo-svg {
-          color: #000000;
         }
 
         .brand-title {
-          font-size: 0.85rem;
-          font-weight: 800;
-          color: #FFFFFF;
-          letter-spacing: 0.08em;
-        }
-
-        .brand-badge {
-          font-size: 0.65rem;
+          font-size: 0.775rem;
           font-weight: 700;
-          color: var(--text-secondary);
-          border: 1px solid var(--border-subtle);
-          border-radius: 4px;
-          padding: 0.05rem 0.3rem;
-          background: rgba(255, 255, 255, 0.02);
-        }
-
-        .status-indicator {
-          display: flex;
-          align-items: center;
-          gap: 0.35rem;
-          padding: 0.15rem 0.5rem;
-          border-radius: var(--radius-full);
-          border: 1px solid rgba(255, 255, 255, 0.04);
-          background: rgba(255, 255, 255, 0.01);
-          font-size: 0.675rem;
-          color: var(--text-secondary);
-          margin-left: 0.5rem;
-        }
-
-        .status-dot {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: #555;
-        }
-
-        .status-dot.active {
-          background: #10B981;
+          color: #FFFFFF;
+          letter-spacing: 0.15em;
         }
 
         .navbar-actions {
           display: flex;
           align-items: center;
-          gap: 0.4rem;
+          gap: 1.15rem;
         }
 
         .nav-link-btn {
           background: transparent;
-          border: 1px solid transparent;
+          border: none;
           color: var(--text-secondary);
           font-family: var(--font-ui);
-          font-size: 0.775rem;
+          font-size: 0.75rem;
           font-weight: 600;
           cursor: pointer;
           display: flex;
           align-items: center;
           gap: 0.35rem;
-          padding: 0.35rem 0.75rem;
-          border-radius: var(--radius-full);
-          transition: all var(--transition-fast);
+          padding: 0.2rem 0;
+          transition: color var(--transition-fast);
         }
 
         .nav-link-btn:hover {
           color: #FFFFFF;
-          background: rgba(255, 255, 255, 0.04);
-          border-color: rgba(255, 255, 255, 0.06);
-        }
-
-        .nav-link-btn.active {
-          color: #000000;
-          background: #FFFFFF;
-          border-color: #FFFFFF;
         }
 
         .nav-divider {
           width: 1px;
-          height: 14px;
+          height: 12px;
           background: rgba(255, 255, 255, 0.08);
-          margin: 0 0.4rem;
+        }
+
+        /* Minimal Status Indicator */
+        .engine-status-tag {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          letter-spacing: 0.05em;
+        }
+
+        .status-dot-core {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #555;
+        }
+
+        .engine-status-tag.active .status-dot-core {
+          background: #10B981;
+          box-shadow: 0 0 6px #10B981;
+        }
+
+        .engine-status-tag.active .status-dot-label {
+          color: #10B981;
         }
 
         .github-nav-link {
           color: var(--text-secondary);
           display: flex;
           align-items: center;
-          justify-content: center;
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          transition: all var(--transition-fast);
+          transition: color var(--transition-fast);
         }
 
         .github-nav-link:hover {
           color: #FFFFFF;
-          background: rgba(255, 255, 255, 0.04);
         }
 
         @media (max-width: 640px) {
           .nav-link-btn span {
             display: none;
           }
-          .status-indicator {
+          .status-dot-label {
             display: none;
           }
         }
