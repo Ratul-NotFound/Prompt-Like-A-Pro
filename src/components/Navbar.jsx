@@ -1,27 +1,32 @@
 import React from 'react';
-import { Settings, BookOpen, History, Github } from 'lucide-react';
+import { Settings, BookOpen, History, Github, Terminal } from 'lucide-react';
 
 export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey }) {
   return (
     <header className="navbar-container">
       <div className="navbar-inner">
-        {/* Minimalist Brand Name */}
+        {/* Modern Developer-style Brand Logo */}
         <div className="brand-group">
-          <span className="brand-title">Prompt Like A Pro</span>
+          <div className="brand-logo-icon">
+            <Terminal size={12} className="logo-svg" />
+          </div>
+          <span className="brand-title">PROMPT</span>
+          <span className="brand-badge">PRO</span>
+          
           <div className="status-indicator">
             <span className={`status-dot ${hasApiKey ? 'active' : ''}`} />
-            <span className="status-text">{hasApiKey ? 'Gemini AI' : 'Local Engine'}</span>
+            <span className="status-text">{hasApiKey ? 'Gemini AI Active' : 'Local Sandbox'}</span>
           </div>
         </div>
 
-        {/* Crisp Navigation Links */}
+        {/* Premium Capsule Navigation Links */}
         <div className="navbar-actions">
           <button 
             className="nav-link-btn"
             onClick={onOpenGuide}
             title="Read Prompting Guide"
           >
-            <BookOpen size={14} />
+            <BookOpen size={13} />
             <span>Guide</span>
           </button>
 
@@ -30,7 +35,7 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
             onClick={onToggleHistory}
             title="View History"
           >
-            <History size={14} />
+            <History size={13} />
             <span>History</span>
           </button>
 
@@ -39,9 +44,11 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
             onClick={onOpenSettings}
             title="API Settings"
           >
-            <Settings size={14} />
+            <Settings size={13} />
             <span>Settings</span>
           </button>
+
+          <div className="nav-divider" />
 
           <a 
             href="https://github.com/Ratul-NotFound/Prompt-Like-A-Pro"
@@ -50,38 +57,67 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
             className="github-nav-link"
             title="GitHub Repository"
           >
-            <Github size={16} />
+            <Github size={15} />
           </a>
         </div>
       </div>
 
       <style>{`
         .navbar-container {
+          position: sticky;
+          top: 0;
+          z-index: 900;
           width: 100%;
-          border-bottom: 1px solid var(--border-subtle);
-          background: #171717; /* ChatGPT-style solid dark header */
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          background: rgba(11, 12, 16, 0.85); /* Premium glass background */
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
         }
 
         .navbar-inner {
-          max-width: 840px; /* Aligns perfectly with the centered chat layout */
+          max-width: 840px; /* Aligns with the centered chatbot canvas */
           margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.85rem 1.25rem;
+          padding: 0.75rem 1.25rem;
         }
 
         .brand-group {
           display: flex;
           align-items: center;
-          gap: 0.65rem;
+          gap: 0.5rem;
+        }
+
+        .brand-logo-icon {
+          width: 22px;
+          height: 22px;
+          border-radius: 6px;
+          background: #FFFFFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .logo-svg {
+          color: #000000;
         }
 
         .brand-title {
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: var(--text-primary);
-          letter-spacing: -0.01em;
+          font-size: 0.85rem;
+          font-weight: 800;
+          color: #FFFFFF;
+          letter-spacing: 0.08em;
+        }
+
+        .brand-badge {
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: var(--text-secondary);
+          border: 1px solid var(--border-subtle);
+          border-radius: 4px;
+          padding: 0.05rem 0.3rem;
+          background: rgba(255, 255, 255, 0.02);
         }
 
         .status-indicator {
@@ -90,10 +126,11 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           gap: 0.35rem;
           padding: 0.15rem 0.5rem;
           border-radius: var(--radius-full);
-          border: 1px solid var(--border-subtle);
-          background: rgba(255, 255, 255, 0.02);
-          font-size: 0.7rem;
+          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: rgba(255, 255, 255, 0.01);
+          font-size: 0.675rem;
           color: var(--text-secondary);
+          margin-left: 0.5rem;
         }
 
         .status-dot {
@@ -110,45 +147,60 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
         .navbar-actions {
           display: flex;
           align-items: center;
-          gap: 1.15rem; /* Clean text spacing instead of cluttered buttons */
+          gap: 0.4rem; /* Tight spacing for capsule tabs */
         }
 
         .nav-link-btn {
           background: transparent;
-          border: none;
+          border: 1px solid transparent;
           color: var(--text-secondary);
           font-family: var(--font-ui);
-          font-size: 0.8rem;
-          font-weight: 500;
+          font-size: 0.775rem;
+          font-weight: 600;
           cursor: pointer;
           display: flex;
           align-items: center;
           gap: 0.35rem;
-          padding: 0.25rem 0;
-          transition: color var(--transition-fast);
+          padding: 0.35rem 0.75rem;
+          border-radius: var(--radius-full);
+          transition: all var(--transition-fast);
         }
 
         .nav-link-btn:hover {
-          color: var(--text-primary);
+          color: #FFFFFF;
+          background: rgba(255, 255, 255, 0.04);
+          border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-divider {
+          width: 1px;
+          height: 14px;
+          background: rgba(255, 255, 255, 0.08);
+          margin: 0 0.4rem;
         }
 
         .github-nav-link {
           color: var(--text-secondary);
           display: flex;
           align-items: center;
-          transition: color var(--transition-fast);
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          transition: all var(--transition-fast);
         }
 
         .github-nav-link:hover {
-          color: var(--text-primary);
+          color: #FFFFFF;
+          background: rgba(255, 255, 255, 0.04);
         }
 
         @media (max-width: 640px) {
           .nav-link-btn span {
             display: none;
           }
-          .navbar-actions {
-            gap: 0.85rem;
+          .status-indicator {
+            display: none;
           }
         }
       `}</style>
