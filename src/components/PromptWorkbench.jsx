@@ -50,19 +50,18 @@ export default function PromptWorkbench({
   };
 
   return (
-    <div className="workbench-container">
-      {/* Left Pane: Raw Input */}
-      <div className="pane raw-pane glass-card">
-        <div className="pane-header">
+    <div className="vertical-workbench-flow">
+      {/* Middle Section: Raw Prompt Input Box */}
+      <div className="workbench-card raw-card glass-card">
+        <div className="card-header-bar">
           <div className="header-left">
             <Code size={18} className="text-indigo" />
-            <h3 className="pane-title">1. Raw Input Prompt</h3>
+            <h3 className="card-title">Prompt Input Field</h3>
           </div>
           {rawInput && (
             <button 
               className="btn btn-ghost btn-sm"
               onClick={() => onRawInputChange('')}
-              title="Clear input"
             >
               <RotateCcw size={14} />
               <span>Clear</span>
@@ -70,23 +69,23 @@ export default function PromptWorkbench({
           )}
         </div>
 
-        <div className="pane-body">
+        <div className="card-body-area">
           <textarea
-            className="raw-textarea"
-            rows={10}
+            className="main-textarea"
+            rows={5}
             value={rawInput}
             onChange={(e) => onRawInputChange(e.target.value)}
             placeholder={`Type your raw prompt idea here...\n\ne.g., "${selectedDomain.examples[0]}"`}
           />
 
-          {/* Preset Example Starters */}
-          <div className="examples-bar">
-            <span className="examples-label">Try Example:</span>
-            <div className="examples-list">
+          {/* Example Pills */}
+          <div className="example-starters-bar">
+            <span className="starters-label">Try Example Idea:</span>
+            <div className="starters-list">
               {selectedDomain.examples.map((ex, idx) => (
                 <button
                   key={idx}
-                  className="example-pill"
+                  className="starter-pill"
                   onClick={() => onRawInputChange(ex)}
                 >
                   "{ex}"
@@ -96,14 +95,14 @@ export default function PromptWorkbench({
           </div>
         </div>
 
-        <div className="pane-footer">
-          <div className="counter-group">
-            <span className="count-tag">{rawInput.length} chars</span>
-            <span className="count-tag">~{Math.ceil(rawInput.length / 4)} tokens</span>
+        <div className="card-footer-bar">
+          <div className="meta-counts">
+            <span className="count-badge">{rawInput.length} chars</span>
+            <span className="count-badge">~{Math.ceil(rawInput.length / 4)} tokens</span>
           </div>
 
           <button
-            className="btn btn-primary btn-enhance"
+            className="btn btn-primary btn-enhance-main"
             onClick={onEnhance}
             disabled={!rawInput.trim() || isEnhancing}
           >
@@ -122,25 +121,25 @@ export default function PromptWorkbench({
         </div>
       </div>
 
-      {/* Right Pane: Enhanced Output */}
-      <div className="pane output-pane glass-card">
-        <div className="pane-header">
+      {/* Bottom Section: Enhanced Output View */}
+      <div className="workbench-card output-card glass-card">
+        <div className="card-header-bar">
           <div className="header-left">
             <Zap size={18} className="text-emerald" />
-            <h3 className="pane-title">2. Enhanced Engineered Prompt</h3>
+            <h3 className="card-title">Enhanced Prompt Output</h3>
           </div>
 
           {enhancedResult?.enhancedText && (
-            <div className="view-toggle">
+            <div className="view-mode-tabs">
               <button
-                className={`toggle-tab ${viewMode === 'formatted' ? 'active' : ''}`}
+                className={`tab-btn ${viewMode === 'formatted' ? 'active' : ''}`}
                 onClick={() => setViewMode('formatted')}
               >
                 <Eye size={13} />
-                <span>Prompt View</span>
+                <span>Formatted View</span>
               </button>
               <button
-                className={`toggle-tab ${viewMode === 'diff' ? 'active' : ''}`}
+                className={`tab-btn ${viewMode === 'diff' ? 'active' : ''}`}
                 onClick={() => setViewMode('diff')}
               >
                 <Layers size={13} />
@@ -150,24 +149,19 @@ export default function PromptWorkbench({
           )}
         </div>
 
-        <div className="pane-body">
+        <div className="card-body-area">
           {!enhancedResult?.enhancedText ? (
-            <div className="output-placeholder">
-              <Sparkles size={36} className="placeholder-icon" />
-              <h4 className="placeholder-title">Ready to Engineer Your Prompt</h4>
-              <p className="placeholder-desc">Type your idea on the left and click <strong>Enhance Prompt Now</strong> to generate a structured, persona-primed prompt.</p>
+            <div className="empty-state">
+              <Sparkles size={36} className="empty-sparkle" />
+              <h4 className="empty-heading">Ready to Engineer Your Prompt</h4>
+              <p className="empty-sub">Type your idea above, select a category subcategory, and click <strong>Enhance Prompt Now</strong>.</p>
             </div>
           ) : (
-            <div className="output-content animate-fade-in">
+            <div className="output-wrapper animate-fade-in">
               {viewMode === 'formatted' ? (
-                <div className="formatted-view">
-                  <pre className="enhanced-code">{enhancedResult.enhancedText}</pre>
-                </div>
+                <pre className="code-display">{enhancedResult.enhancedText}</pre>
               ) : (
-                <div className="diff-view">
-                  <div className="diff-intro">
-                    <p>Below are the specific prompt engineering layers added by Prompt Like A Pro:</p>
-                  </div>
+                <div className="diff-breakdown-list">
                   {enhancedResult.additions?.map((item, idx) => (
                     <div key={idx} className="diff-added">
                       <span className="diff-tag">+{item.tag}</span>
@@ -181,30 +175,28 @@ export default function PromptWorkbench({
         </div>
 
         {enhancedResult?.enhancedText && (
-          <div className="pane-footer output-footer">
-            <div className="counter-group">
+          <div className="card-footer-bar">
+            <div className="meta-counts">
               <span className="badge badge-emerald">~{enhancedResult.tokenCount} Tokens</span>
               {enhancedResult.variables?.length > 0 && (
                 <span className="badge badge-cyan">{enhancedResult.variables.length} Variables</span>
               )}
             </div>
 
-            <div className="action-buttons">
+            <div className="action-buttons-group">
               <button
                 className="btn btn-ghost btn-sm"
                 onClick={() => onSaveToHistory(enhancedResult)}
-                title="Save to History"
               >
-                <Star size={15} />
+                <Star size={14} />
                 <span>Save</span>
               </button>
 
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={handleExportMarkdown}
-                title="Export as Markdown file"
               >
-                <Download size={15} />
+                <Download size={14} />
                 <span>Export .md</span>
               </button>
 
@@ -213,7 +205,7 @@ export default function PromptWorkbench({
                   className="btn btn-emerald btn-sm"
                   onClick={onOpenVariableModal}
                 >
-                  <Sliders size={15} />
+                  <Sliders size={14} />
                   <span>Fill Variables</span>
                 </button>
               ) : (
@@ -221,7 +213,7 @@ export default function PromptWorkbench({
                   className="btn btn-primary btn-sm"
                   onClick={handleCopyClick}
                 >
-                  {copied ? <Check size={15} /> : <Copy size={15} />}
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
                   <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
                 </button>
               )}
@@ -231,23 +223,24 @@ export default function PromptWorkbench({
       </div>
 
       <style>{`
-        .workbench-container {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
+        .vertical-workbench-flow {
+          display: flex;
+          flex-direction: column;
           gap: 1.5rem;
         }
 
-        .pane {
+        .workbench-card {
           display: flex;
           flex-direction: column;
-          min-height: 520px;
+          border-radius: var(--radius-lg);
+          overflow: hidden;
         }
 
-        .pane-header {
+        .card-header-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 1rem 1.25rem;
+          padding: 0.9rem 1.25rem;
           border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -257,62 +250,59 @@ export default function PromptWorkbench({
           gap: 0.5rem;
         }
 
-        .pane-title {
+        .card-title {
           font-size: 0.95rem;
           font-weight: 700;
           color: var(--text-primary);
         }
 
-        .pane-body {
-          flex: 1;
+        .card-body-area {
+          padding: 1.25rem;
           display: flex;
           flex-direction: column;
-          padding: 1.25rem;
-          overflow-y: auto;
         }
 
-        .raw-textarea {
+        .main-textarea {
           width: 100%;
-          flex: 1;
-          min-height: 280px;
+          min-height: 140px;
           background: var(--bg-input);
           border: 1px solid var(--border-medium);
           border-radius: var(--radius-md);
           padding: 1rem;
           color: var(--text-primary);
           font-family: var(--font-ui);
-          font-size: 0.9rem;
+          font-size: 0.925rem;
           line-height: 1.5;
           outline: none;
           resize: vertical;
           transition: border-color var(--transition-fast);
         }
 
-        .raw-textarea:focus {
+        .main-textarea:focus {
           border-color: var(--accent-primary);
           box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
         }
 
-        .examples-bar {
+        .example-starters-bar {
           margin-top: 0.85rem;
           display: flex;
           flex-direction: column;
           gap: 0.35rem;
         }
 
-        .examples-label {
+        .starters-label {
           font-size: 0.725rem;
           color: var(--text-muted);
           font-weight: 600;
         }
 
-        .examples-list {
+        .starters-list {
           display: flex;
           flex-wrap: wrap;
           gap: 0.4rem;
         }
 
-        .example-pill {
+        .starter-pill {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid var(--border-subtle);
           color: var(--text-secondary);
@@ -324,13 +314,13 @@ export default function PromptWorkbench({
           text-align: left;
         }
 
-        .example-pill:hover {
+        .starter-pill:hover {
           background: rgba(99, 102, 241, 0.1);
           color: #818CF8;
           border-color: rgba(99, 102, 241, 0.3);
         }
 
-        .pane-footer {
+        .card-footer-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -339,49 +329,80 @@ export default function PromptWorkbench({
           background: rgba(11, 16, 26, 0.4);
         }
 
-        .counter-group {
+        .meta-counts {
           display: flex;
           align-items: center;
           gap: 0.5rem;
         }
 
-        .count-tag {
+        .count-badge {
           font-size: 0.75rem;
           color: var(--text-muted);
           font-family: var(--font-mono);
         }
 
-        .output-placeholder {
-          flex: 1;
+        .empty-state {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
+          padding: 3rem 1.5rem;
           text-align: center;
-          padding: 2rem;
           color: var(--text-muted);
         }
 
-        .placeholder-icon {
+        .empty-sparkle {
           color: var(--accent-primary);
           opacity: 0.4;
-          margin-bottom: 0.85rem;
+          margin-bottom: 0.75rem;
         }
 
-        .placeholder-title {
-          font-size: 1.05rem;
+        .empty-heading {
+          font-size: 1rem;
           font-weight: 700;
           color: var(--text-secondary);
-          margin-bottom: 0.35rem;
+          margin-bottom: 0.25rem;
         }
 
-        .placeholder-desc {
+        .empty-sub {
           font-size: 0.825rem;
-          max-width: 320px;
-          line-height: 1.5;
+          max-width: 340px;
+          line-height: 1.45;
         }
 
-        .view-toggle {
+        .code-display {
+          background: var(--bg-input);
+          border: 1px solid var(--border-medium);
+          border-radius: var(--radius-md);
+          padding: 1rem;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          line-height: 1.6;
+          color: #E2E8F0;
+          white-space: pre-wrap;
+          word-break: break-word;
+          max-height: 380px;
+          overflow-y: auto;
+        }
+
+        .diff-breakdown-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          max-height: 380px;
+          overflow-y: auto;
+        }
+
+        .diff-text {
+          font-family: var(--font-mono);
+          font-size: 0.8rem;
+          color: #CBD5E1;
+          white-space: pre-wrap;
+          word-break: break-word;
+          margin-top: 0.2rem;
+        }
+
+        .view-mode-tabs {
           display: flex;
           background: var(--bg-input);
           padding: 2px;
@@ -389,7 +410,7 @@ export default function PromptWorkbench({
           border: 1px solid var(--border-subtle);
         }
 
-        .toggle-tab {
+        .tab-btn {
           display: flex;
           align-items: center;
           gap: 0.35rem;
@@ -403,49 +424,12 @@ export default function PromptWorkbench({
           cursor: pointer;
         }
 
-        .toggle-tab.active {
+        .tab-btn.active {
           background: var(--bg-surface-hover);
           color: var(--text-primary);
         }
 
-        .enhanced-code {
-          background: var(--bg-input);
-          border: 1px solid var(--border-medium);
-          border-radius: var(--radius-md);
-          padding: 1rem;
-          font-family: var(--font-mono);
-          font-size: 0.825rem;
-          line-height: 1.6;
-          color: #E2E8F0;
-          white-space: pre-wrap;
-          word-break: break-word;
-          max-height: 400px;
-          overflow-y: auto;
-        }
-
-        .diff-view {
-          display: flex;
-          flex-direction: column;
-          gap: 0.85rem;
-          max-height: 400px;
-          overflow-y: auto;
-        }
-
-        .diff-intro {
-          font-size: 0.775rem;
-          color: var(--text-muted);
-        }
-
-        .diff-text {
-          font-family: var(--font-mono);
-          font-size: 0.8rem;
-          color: #CBD5E1;
-          white-space: pre-wrap;
-          word-break: break-word;
-          margin-top: 0.2rem;
-        }
-
-        .action-buttons {
+        .action-buttons-group {
           display: flex;
           align-items: center;
           gap: 0.5rem;
@@ -465,12 +449,6 @@ export default function PromptWorkbench({
 
         @keyframes spin {
           to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 960px) {
-          .workbench-container {
-            grid-template-columns: 1fr;
-          }
         }
       `}</style>
     </div>

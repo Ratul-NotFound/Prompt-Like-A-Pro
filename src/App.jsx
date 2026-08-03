@@ -4,7 +4,7 @@ import { enhancePrompt } from './utils/enhancerEngine';
 import { enhancePromptWithGemini } from './utils/geminiApi';
 
 import Navbar from './components/Navbar';
-import DomainSelector from './components/DomainSelector';
+import CategoryDropdownHeader from './components/CategoryDropdownHeader';
 import COStarTuner from './components/COStarTuner';
 import PromptWorkbench from './components/PromptWorkbench';
 import Toast from './components/Toast';
@@ -55,12 +55,11 @@ export default function App() {
     setIsEnhancing(true);
 
     try {
-      let resultText = '';
       let resultObj = null;
 
       if (apiKey && apiKey.trim()) {
         // Live Gemini AI Mode
-        resultText = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey);
+        const resultText = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey);
         resultObj = {
           enhancedText: resultText,
           additions: [{ tag: 'Gemini AI Meta-Prompt Engine', text: resultText }],
@@ -114,7 +113,7 @@ export default function App() {
       timestamp: new Date().toISOString()
     };
 
-    setHistory(prev => [historyItem, ...prev.slice(0, 49)]); // Keep last 50
+    setHistory(prev => [historyItem, ...prev.slice(0, 49)]);
     showToast('Prompt saved to History!', 'info');
   };
 
@@ -149,14 +148,14 @@ export default function App() {
         onToggleHistory={() => setShowHistory(true)}
       />
 
-      {/* Main Content Area */}
+      {/* Main Layout Flow */}
       <main className="main-content">
-        {/* Domain Selector */}
-        <DomainSelector
+        {/* 1. Top Section: Category Cards with Interactive Subcategory Dropdowns */}
+        <CategoryDropdownHeader
           selectedDomain={selectedDomain}
           onSelectDomain={(dom) => {
             setSelectedDomain(dom);
-            setTunerSettings({}); // reset domain specific overrides
+            setTunerSettings({});
           }}
         />
 
@@ -167,7 +166,7 @@ export default function App() {
           selectedDomain={selectedDomain}
         />
 
-        {/* Dual Pane Workbench */}
+        {/* 2. Middle & 3. Bottom Sections: Prompt Input & Enhanced Output View */}
         <PromptWorkbench
           rawInput={rawInput}
           onRawInputChange={setRawInput}
