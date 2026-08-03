@@ -18,10 +18,10 @@ export default function App() {
   const [enhancedResult, setEnhancedResult] = useState(null);
   const [tunerSettings, setTunerSettings] = useState({});
   const [isEnhancing, setIsEnhancing] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Collapsible parameters sidebar state
 
   // LocalStorage Persistence
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('prompt_pro_gemini_key') || '');
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('prompt_pro_gemini_model') || 'gemini-1.5-pro');
   const [history, setHistory] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('prompt_pro_history')) || [];
@@ -42,6 +42,10 @@ export default function App() {
   }, [apiKey]);
 
   useEffect(() => {
+    localStorage.setItem('prompt_pro_gemini_model', selectedModel);
+  }, [selectedModel]);
+
+  useEffect(() => {
     localStorage.setItem('prompt_pro_history', JSON.stringify(history));
   }, [history]);
 
@@ -58,15 +62,15 @@ export default function App() {
       let resultObj = null;
 
       if (apiKey && apiKey.trim()) {
-        const resultText = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey);
+        const resultText = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel);
         resultObj = {
           enhancedText: resultText,
-          additions: [{ tag: 'Gemini AI Meta-Prompt Engine', text: resultText }],
+          additions: [{ tag: `${selectedModel === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'} Meta-Prompt Engine`, text: resultText }],
           variables: [],
           tokenCount: Math.ceil(resultText.length / 4),
           rawTokenCount: Math.ceil(rawInput.length / 4)
         };
-        showToast('Prompt enhanced using Gemini AI!', 'success');
+        showToast(`Enhanced using ${selectedModel === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro (Deep Logic)' : 'Gemini 1.5 Flash'}!`, 'success');
       } else {
         resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
         showToast('Prompt enhanced with CO-STAR framework!', 'success');
@@ -138,44 +142,34 @@ export default function App() {
         onOpenSettings={() => setShowSettings(true)}
         onOpenGuide={() => setShowGuide(true)}
         onToggleHistory={() => setShowHistory(true)}
-        sidebarOpen={sidebarOpen}
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
       {/* Main Content Layout Flow */}
       <main className="main-content">
-        <div className={`playground-split-view ${sidebarOpen ? 'has-sidebar' : 'full-width-chat'}`}>
-          {/* Main Chat Workbench Area (Input at Top, Categories Middle, Output Bottom) */}
-          <div className="chat-workbench-pane">
-            <SketchLayoutWorkbench
-              rawInput={rawInput}
-              onRawInputChange={setRawInput}
-              enhancedResult={enhancedResult}
-              selectedDomain={selectedDomain}
-              onSelectDomain={(dom) => {
-                setSelectedDomain(dom);
-                setTunerSettings({});
-              }}
-              onEnhance={handleEnhance}
-              isEnhancing={isEnhancing}
-              hasApiKey={Boolean(apiKey)}
-              onCopy={handleCopyPrompt}
-              onOpenVariableModal={() => setShowVariableModal(true)}
-              onSaveToHistory={handleSaveToHistory}
-            />
-          </div>
+        {/* 1. Prompt Parameters Tuner placed above the Prompt Input Box */}
+        <COStarTuner
+          settings={tunerSettings}
+          onChangeSettings={setTunerSettings}
+          selectedDomain={selectedDomain}
+        />
 
-          {/* Collapsible Slide-in Parameters Panel */}
-          {sidebarOpen && (
-            <div className="parameters-sidebar-pane">
-              <COStarTuner
-                settings={tunerSettings}
-                onChangeSettings={setTunerSettings}
-                selectedDomain={selectedDomain}
-              />
-            </div>
-          )}
-        </div>
+        {/* 2. Prompt Input & Output Flow */}
+        <SketchLayoutWorkbench
+          rawInput={rawInput}
+          onRawInputChange={setRawInput}
+          enhancedResult={enhancedResult}
+          selectedDomain={selectedDomain}
+          onSelectDomain={(dom) => {
+            setSelectedDomain(dom);
+            setTunerSettings({});
+          }}
+          onEnhance={handleEnhance}
+          isEnhancing={isEnhancing}
+          hasApiKey={Boolean(apiKey)}
+          onCopy={handleCopyPrompt}
+          onOpenVariableModal={() => setShowVariableModal(true)}
+          onSaveToHistory={handleSaveToHistory}
+        />
       </main>
 
       {/* Footer */}
@@ -238,6 +232,8 @@ export default function App() {
         <SettingsModal
           apiKey={apiKey}
           onSaveApiKey={setApiKey}
+          selectedModel={selectedModel}
+          onSaveModel={setSelectedModel}
           onClose={() => setShowSettings(false)}
         />
       )}

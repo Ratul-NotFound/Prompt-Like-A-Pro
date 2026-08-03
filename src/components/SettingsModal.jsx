@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Key, X, Check, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Key, X, Check, ExternalLink, ShieldCheck, Cpu } from 'lucide-react';
 
-export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
+export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onSaveModel, onClose }) {
   const [inputKey, setInputKey] = useState(apiKey || '');
+  const [model, setModel] = useState(selectedModel || 'gemini-1.5-pro');
 
   const handleSave = (e) => {
     e.preventDefault();
     onSaveApiKey(inputKey.trim());
+    onSaveModel(model);
     onClose();
   };
 
@@ -15,8 +17,8 @@ export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
       <div className="modal-content glass-card animate-fade-in">
         <div className="modal-header">
           <div className="header-left">
-            <Key size={20} className="modal-icon-emerald" />
-            <h3 className="modal-title">Live AI API Configuration</h3>
+            <Key size={18} className="modal-icon-emerald" />
+            <h3 className="modal-title">API Settings & Model Control</h3>
           </div>
           <button className="btn btn-ghost btn-sm" onClick={onClose}>
             <X size={18} />
@@ -26,10 +28,28 @@ export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
         <form onSubmit={handleSave} className="modal-body">
           <div className="security-notice">
             <ShieldCheck size={18} className="notice-icon" />
-            <p>Your API key is stored <strong>locally in your browser</strong> (localStorage). It is never sent to any middleman server.</p>
+            <p>Your API key is stored <strong>locally in your browser</strong> (localStorage). It is never sent to any intermediary server.</p>
           </div>
 
-          <div className="input-group" style={{ marginTop: '1rem' }}>
+          {/* Model Selector (New addition for lifetime free premium models) */}
+          <div className="input-group" style={{ marginTop: '0.5rem' }}>
+            <label className="input-label">Select Model Engine</label>
+            <div className="select-wrapper">
+              <select
+                className="tuner-input"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              >
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Recommended - Deep Intent Analysis & Reasoning)</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Lightweight, Faster Responses)</option>
+              </select>
+            </div>
+            <p className="model-desc">
+              <strong>Gemini 1.5 Pro</strong> features advanced cognitive reasoning and excels at understanding complex, nuanced instructions to craft elite prompts. Both models are available under Google AI Studio's free tier.
+            </p>
+          </div>
+
+          <div className="input-group" style={{ marginTop: '0.5rem' }}>
             <label className="input-label">Google Gemini API Key (Optional)</label>
             <input
               type="password"
@@ -52,7 +72,7 @@ export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
             </a>
           </p>
 
-          <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+          <div className="modal-actions" style={{ marginTop: '1.25rem' }}>
             {apiKey && (
               <button 
                 type="button" 
@@ -70,7 +90,7 @@ export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
             </button>
             <button type="submit" className="btn btn-emerald">
               <Check size={16} />
-              <span>Save & Activate</span>
+              <span>Save & Apply</span>
             </button>
           </div>
         </form>
@@ -100,6 +120,22 @@ export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
           margin-top: 2px;
         }
 
+        .select-wrapper {
+          position: relative;
+          width: 100%;
+        }
+
+        .tuner-input select {
+          appearance: none;
+        }
+
+        .model-desc {
+          font-size: 0.725rem;
+          color: var(--text-muted);
+          line-height: 1.35;
+          margin-top: 0.25rem;
+        }
+
         .key-help {
           font-size: 0.775rem;
           color: var(--text-muted);
@@ -111,7 +147,7 @@ export default function SettingsModal({ apiKey, onSaveApiKey, onClose }) {
           text-decoration: none;
           display: inline-flex;
           align-items: center;
-          gap: 0.2rem;
+          gap: 0.25rem;
         }
 
         .link:hover {

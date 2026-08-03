@@ -1,9 +1,10 @@
 /**
  * Prompt Like A Pro — Optional Live Gemini Meta-Prompt API Client
- * Uses Google Gemini Flash REST API to perform live AI-to-AI prompt engineering.
+ * Uses Google Gemini REST API to perform live AI-to-AI prompt engineering.
+ * Defaults to gemini-1.5-pro for deep reasoning and intent analysis.
  */
 
-export async function enhancePromptWithGemini(rawPrompt, domain, apiKey) {
+export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-1.5-pro') {
   if (!apiKey || !apiKey.trim()) {
     throw new Error('Gemini API Key is missing. Please provide a valid key in Settings.');
   }
@@ -27,7 +28,7 @@ RAW USER PROMPT TO ENHANCE:
 
 Please generate the enhanced, professionally engineered prompt now:`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
 
   try {
     const response = await fetch(url, {
@@ -46,7 +47,7 @@ Please generate the enhanced, professionally engineered prompt now:`;
         ],
         generationConfig: {
           temperature: 0.4,
-          maxOutputTokens: 1500
+          maxOutputTokens: 2000
         }
       })
     });
