@@ -1,7 +1,7 @@
 import React from 'react';
-import { Settings, BookOpen, History, Github, Terminal } from 'lucide-react';
+import { Settings, BookOpen, History, Github, Terminal, Sliders } from 'lucide-react';
 
-export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey }) {
+export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey, sidebarOpen, onToggleSidebar }) {
   return (
     <header className="navbar-container">
       <div className="navbar-inner">
@@ -21,6 +21,16 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
 
         {/* Premium Capsule Navigation Links */}
         <div className="navbar-actions">
+          {/* Collapsible parameters panel toggle button */}
+          <button 
+            className={`nav-link-btn tuner-toggle ${sidebarOpen ? 'active' : ''}`}
+            onClick={onToggleSidebar}
+            title={sidebarOpen ? "Hide Tuner Panel" : "Show Tuner Panel"}
+          >
+            <Sliders size={13} />
+            <span>Tuner</span>
+          </button>
+
           <button 
             className="nav-link-btn"
             onClick={onOpenGuide}
@@ -69,18 +79,24 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           z-index: 900;
           width: 100%;
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          background: rgba(11, 12, 16, 0.85); /* Premium glass background */
+          background: rgba(11, 12, 16, 0.85);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
         }
 
         .navbar-inner {
-          max-width: 840px; /* Aligns with the centered chatbot canvas */
+          max-width: 840px;
           margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1.25rem;
+          transition: max-width 0.2s ease;
+        }
+
+        /* Expand header width dynamically when sidebar layout is visible */
+        .navbar-container:has(+ main .has-sidebar) .navbar-inner {
+          max-width: 1200px;
         }
 
         .brand-group {
@@ -147,7 +163,7 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
         .navbar-actions {
           display: flex;
           align-items: center;
-          gap: 0.4rem; /* Tight spacing for capsule tabs */
+          gap: 0.4rem;
         }
 
         .nav-link-btn {
@@ -170,6 +186,12 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           color: #FFFFFF;
           background: rgba(255, 255, 255, 0.04);
           border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-link-btn.active {
+          color: #000000;
+          background: #FFFFFF;
+          border-color: #FFFFFF;
         }
 
         .nav-divider {

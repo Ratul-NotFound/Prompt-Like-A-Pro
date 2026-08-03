@@ -18,6 +18,7 @@ export default function App() {
   const [enhancedResult, setEnhancedResult] = useState(null);
   const [tunerSettings, setTunerSettings] = useState({});
   const [isEnhancing, setIsEnhancing] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Collapsible parameters sidebar state
 
   // LocalStorage Persistence
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('prompt_pro_gemini_key') || '');
@@ -137,34 +138,44 @@ export default function App() {
         onOpenSettings={() => setShowSettings(true)}
         onOpenGuide={() => setShowGuide(true)}
         onToggleHistory={() => setShowHistory(true)}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
       {/* Main Content Layout Flow */}
       <main className="main-content">
-        {/* 1. Prompt Parameters Tuner placed above the Prompt Input Box */}
-        <COStarTuner
-          settings={tunerSettings}
-          onChangeSettings={setTunerSettings}
-          selectedDomain={selectedDomain}
-        />
+        <div className={`playground-split-view ${sidebarOpen ? 'has-sidebar' : 'full-width-chat'}`}>
+          {/* Main Chat Workbench Area (Input at Top, Categories Middle, Output Bottom) */}
+          <div className="chat-workbench-pane">
+            <SketchLayoutWorkbench
+              rawInput={rawInput}
+              onRawInputChange={setRawInput}
+              enhancedResult={enhancedResult}
+              selectedDomain={selectedDomain}
+              onSelectDomain={(dom) => {
+                setSelectedDomain(dom);
+                setTunerSettings({});
+              }}
+              onEnhance={handleEnhance}
+              isEnhancing={isEnhancing}
+              hasApiKey={Boolean(apiKey)}
+              onCopy={handleCopyPrompt}
+              onOpenVariableModal={() => setShowVariableModal(true)}
+              onSaveToHistory={handleSaveToHistory}
+            />
+          </div>
 
-        {/* 2. Prompt Input & Output Flow */}
-        <SketchLayoutWorkbench
-          rawInput={rawInput}
-          onRawInputChange={setRawInput}
-          enhancedResult={enhancedResult}
-          selectedDomain={selectedDomain}
-          onSelectDomain={(dom) => {
-            setSelectedDomain(dom);
-            setTunerSettings({});
-          }}
-          onEnhance={handleEnhance}
-          isEnhancing={isEnhancing}
-          hasApiKey={Boolean(apiKey)}
-          onCopy={handleCopyPrompt}
-          onOpenVariableModal={() => setShowVariableModal(true)}
-          onSaveToHistory={handleSaveToHistory}
-        />
+          {/* Collapsible Slide-in Parameters Panel */}
+          {sidebarOpen && (
+            <div className="parameters-sidebar-pane">
+              <COStarTuner
+                settings={tunerSettings}
+                onChangeSettings={setTunerSettings}
+                selectedDomain={selectedDomain}
+              />
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Footer */}
