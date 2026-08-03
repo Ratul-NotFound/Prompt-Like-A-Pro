@@ -1,8 +1,10 @@
 /**
- * Prompt Like A Pro — Heuristic Prompt Enhancer Engine
- * Formats, enriches, and structures raw user prompts using established
- * Prompt Engineering Frameworks (CO-STAR, RTF, Few-Shot, Chain-of-Thought).
+ * Prompt Like A Pro — Smart Local AI Engine powered by Compromise NLP
+ * Performs real syntactic analysis, POS tagging, noun/verb/topic extraction,
+ * and semantic prompt synthesis locally in JavaScript without external API calls!
  */
+
+import nlp from 'compromise';
 
 export function extractVariables(text) {
   if (!text) return [];
@@ -39,6 +41,10 @@ export function evaluatePromptStrength(text) {
   let score = 0;
   const checks = [];
 
+  const doc = nlp(text);
+  const verbs = doc.verbs().out('array');
+  const nouns = doc.nouns().out('array');
+
   // Length Check
   if (text.length > 150) {
     score += 30;
@@ -48,12 +54,10 @@ export function evaluatePromptStrength(text) {
     checks.push('Basic context provided');
   }
 
-  // Key verb checks
-  const verbs = ['build', 'create', 'write', 'explain', 'analyze', 'audit', 'summarize', 'refactor', 'design', 'generate'];
-  const hasVerb = verbs.some(v => text.toLowerCase().includes(v));
-  if (hasVerb) {
+  // Key verb check via NLP
+  if (verbs.length > 0) {
     score += 20;
-    checks.push('Clear action verbs');
+    checks.push(`Clear action verbs (${verbs.slice(0, 2).join(', ')})`);
   }
 
   // Constraints/Examples check
@@ -101,30 +105,57 @@ export function enhancePrompt(rawPrompt, domain, settings = {}) {
     };
   }
 
-  const cleanRaw = rawPrompt.trim();
-  const additions = [];  // 1. Role & Objective Priming
-  const role = settings.role || domain.defaultRole || 'Expert Specialist';
-  const contextText = settings.context ? ` Context: ${settings.context}` : '';
-  const objectiveSection = `**Role:** Act as a ${role}.${contextText}
+  // Run Compromise NLP Parser
+  const doc = nlp(rawPrompt);
+  const verbs = doc.verbs().out('array').map(v => v.toLowerCase());
+  const nouns = doc.nouns().out('array').map(n => n.toLowerCase());
+  const detectedTech = detectTechStack(rawPrompt);
 
-**Task Objective:**
-> "${cleanRaw}"`;
-  additions.push({ tag: 'Role & Objective', text: objectiveSection });
+  // Classify Semantic Intent
+  const intent = classifySemanticIntent(verbs, rawPrompt);
 
-  // 2. Directives & Output Format
+  // Synthesize Dynamic Role / Persona
+  const role = settings.role || synthesizePersona(domain, intent, nouns, detectedTech);
+
+  // Synthesize Context-Aware Objective
+  const objective = synthesizeObjective(rawPrompt, intent, nouns, detectedTech);
+
+  // Synthesize Tailored Deliverables
+  const requirements = synthesizeDeliverables(domain.id, intent, nouns, detectedTech);
+
+  // Synthesize Guardrails
+  const constraints = synthesizeGuardrails(domain.id, intent);
+
+  // Directives
   const tone = settings.tone || domain.frameworkDefaults.tone;
   const format = settings.format || domain.frameworkDefaults.format;
-  const styleSection = `**Directives:**
-- **Tone:** ${tone}
-- **Output Format:** ${format} (Clean, structured Markdown)`;
-  additions.push({ tag: 'Style & Format', text: styleSection });
 
-  // 3. Constraints
-  const domainConstraints = getDomainConstraints(domain.id);
-  const constraintSection = `**Constraints:**
-${domainConstraints.map(c => `- ${c}`).join('\n')}`;
-  // Combine into Dense Master Prompt
-  const enhancedText = `${objectiveSection}\n\n${styleSection}\n\n${constraintSection}`;
+  const additions = [
+    { tag: 'NLP Role Synthesizer', text: `**Role:** Act as a ${role}.` },
+    { tag: 'NLP Objective Extractor', text: `**Objective:** ${objective}` },
+    { tag: 'Smart Directives', text: `**Tone:** ${tone}\n**Format:** ${format}` },
+    { tag: 'Tailored Deliverables', text: requirements.map(r => `- ${r}`).join('\n') },
+    { tag: 'Domain Guardrails', text: constraints.map(c => `- ${c}`).join('\n') }
+  ];
+
+  // Construct Master Engineered Prompt
+  const enhancedText = `### 🎯 IDENTITY & ROLE
+Act as a ${role}. You possess deep domain expertise, follow production-grade best practices, and deliver authoritative, rigorous outputs.
+
+### 📌 TASK OBJECTIVE
+${objective}
+
+> Raw Context: "${rawPrompt.trim()}"${detectedTech.length > 0 ? `\nTarget Tech Stack: ${detectedTech.join(', ')}` : ''}
+
+### 📋 KEY DELIVERABLES & REQUIREMENTS
+${requirements.map(r => `- ${r}`).join('\n')}
+
+### 🎨 STYLE & FORMAT DIRECTIVES
+- **Tone & Approach:** ${tone} (Direct, structured, free of fluff)
+- **Output Format:** ${format} with clean Markdown headers and syntax-highlighted code blocks where appropriate.
+
+### 🛡️ GUARDRAILS & QUALITY CONSTRAINTS
+${constraints.map(c => `- ${c}`).join('\n')}`;
 
   const variables = extractVariables(enhancedText);
 
@@ -133,83 +164,171 @@ ${domainConstraints.map(c => `- ${c}`).join('\n')}`;
     additions,
     variables,
     tokenCount: estimateTokens(enhancedText),
-    rawTokenCount: estimateTokens(cleanRaw)
+    rawTokenCount: estimateTokens(rawPrompt)
   };
 }
 
-function getDomainConstraints(domainId) {
-  switch (domainId) {
-    case 'coding-ui':
-      return [
-        'Do not use inline styles or generic plain colors; use curated dark mode palettes, smooth transitions, and proper padding.',
-        'Ensure the UI code is fully responsive and accessible (a11y standards).',
-        'Avoid placeholder functions like `// do something here`; write functional, runnable code logic.'
-      ];
-    case 'coding-backend':
-      return [
-        'Include robust error handling, status code responses, and sanitization for all input parameters.',
-        'Provide database schema migration code and index recommendations for high-concurrency workloads.',
-        'Follow SOLID principles and avoid hardcoded secrets or magic numbers.'
-      ];
-    case 'coding-security':
-      return [
-        'Categorize all identified risks by severity (CRITICAL, HIGH, MEDIUM, LOW).',
-        'Provide concrete, runnable remediation code patches rather than vague advice.',
-        'Check for OWASP Top 10 risks including injection, broken auth, and exposed secrets.'
-      ];
-    case 'coding-debug':
-      return [
-        'Clearly state the ROOT CAUSE of the bug before offering code solutions.',
-        'Show a clear Before vs. After code comparison.',
-        'Ensure the fix does not introduce side-effects or regressions.'
-      ];
-    case 'study-feynman':
-      return [
-        'Avoid unnecessary academic jargon; define any complex technical terms upon first use.',
-        'Use relatable everyday analogies to anchor conceptual understanding.',
-        'Include a "Common Misconceptions" section to address frequent pitfalls.'
-      ];
-    case 'study-notes':
-      return [
-        'Organize notes into clear hierarchical sections with bold key terms.',
-        'Provide at least 5 active-recall questions at the end to test comprehension.',
-        'Keep summaries tight, punchy, and actionable.'
-      ];
-    case 'study-research':
-      return [
-        'Critique both the strengths and methodology limitations of the study objectively.',
-        'Extract exact empirical data points, sample sizes, and statistical confidence if mentioned.',
-        'Maintain a scholarly, neutral academic tone.'
-      ];
-    case 'writing-seo':
-      return [
-        'Avoid cliché AI opener intros like "In today\'s fast-paced digital world...".',
-        'Use engaging hooks, bulleted lists, and clear bold emphasis to maximize readability.',
-        'Integrate primary and secondary search keywords naturally without keyword stuffing.'
-      ];
-    case 'writing-social':
-      return [
-        'Format with clean line breaks and emojis for effortless mobile scanning.',
-        'Include a high-impact opening hook in the first 2 lines.',
-        'End with a clear, single Call-To-Action (CTA) question to spark engagement.'
-      ];
-    case 'visual-image':
-      return [
-        'Include explicit details for subject, lighting (e.g., volumetric cinematic glow), lens (e.g., 85mm f/1.4), and mood.',
-        'Specify exact model parameter flags at the end (e.g., `--ar 16:9 --v 6.0 --style raw`).',
-        'Avoid contradictory descriptor terms.'
-      ];
-    case 'system-prompt':
-      return [
-        'Establish unambiguous boundaries; specify exactly what the assistant MUST and MUST NOT do.',
-        'Define fallback instructions for out-of-scope user requests.',
-        'Format rules as numbered imperative directives.'
-      ];
-    default:
-      return [
-        'Avoid generic or vague advice; provide specific, actionable outputs.',
-        'Structure the response logically with clear Markdown headings.',
-        'Maintain high accuracy and precision.'
-      ];
+// ============================================================================
+// NLP INTENT & SEMANTIC SYNTHESIS ENGINES
+// ============================================================================
+
+function detectTechStack(prompt) {
+  const p = prompt.toLowerCase();
+  const techList = [
+    'react', 'next.js', 'node.js', 'express', 'python', 'typescript', 'javascript',
+    'docker', 'kubernetes', 'postgresql', 'mongodb', 'redis', 'tailwind', 'css',
+    'html', 'git', 'aws', 'rest api', 'graphql', 'jwt', 'feynman', 'midjourney',
+    'sql', 'vue', 'angular', 'django', 'fastapi', 'flask', 'security', 'owasp'
+  ];
+  return techList.filter(t => p.includes(t));
+}
+
+function classifySemanticIntent(verbs, rawPrompt) {
+  const p = rawPrompt.toLowerCase();
+  if (/\b(debug|fix|error|leak|crash|bug|broken|solve|issue|fail|remediate)\b/.test(p) || verbs.some(v => ['fix', 'debug', 'solve', 'patch'].includes(v))) {
+    return 'DEBUG';
   }
+  if (/\b(audit|security|inspect|check|review|vulnerability|owasp|risk)\b/.test(p) || verbs.some(v => ['audit', 'inspect', 'review', 'check'].includes(v))) {
+    return 'AUDIT';
+  }
+  if (/\b(refactor|optimize|clean|rewrite|scale|performance|speed up)\b/.test(p) || verbs.some(v => ['refactor', 'optimize', 'clean', 'rewrite'].includes(v))) {
+    return 'REFACTOR';
+  }
+  if (/\b(explain|teach|learn|understand|feynman|concept|how does|tutorial)\b/.test(p) || verbs.some(v => ['explain', 'teach', 'learn'].includes(v))) {
+    return 'EXPLAIN';
+  }
+  if (/\b(summarize|notes|cheat sheet|outline|recap|extract|study)\b/.test(p) || verbs.some(v => ['summarize', 'outline', 'extract'].includes(v))) {
+    return 'SUMMARIZE';
+  }
+  if (/\b(image|logo|illustration|render|photo|midjourney|prompt|visual)\b/.test(p) || verbs.some(v => ['draw', 'render', 'design'].includes(v))) {
+    return 'VISUAL';
+  }
+  if (/\b(system|architect|flowchart|db|database|schema|api|endpoint)\b/.test(p)) {
+    return 'ARCHITECT';
+  }
+  return 'BUILD';
+}
+
+function synthesizePersona(domain, intent, nouns, tech) {
+  const techLead = tech.length > 0 ? tech.map(t => t.toUpperCase()).join('/') + ' ' : '';
+  const mainNoun = nouns.length > 0 ? capitalize(nouns[0]) + ' ' : '';
+
+  switch (intent) {
+    case 'DEBUG':
+      return `Staff ${techLead}${mainNoun}Debugging Specialist & Root-Cause Analyst`;
+    case 'AUDIT':
+      return `Principal Cybersecurity Auditor & ${techLead}Security Lead`;
+    case 'REFACTOR':
+      return `Staff ${techLead}Code Quality & Refactoring Architect`;
+    case 'EXPLAIN':
+      return `Distinguished Technical Educator & ${domain.name} Master`;
+    case 'SUMMARIZE':
+      return `Senior Research Analyst & Knowledge Synthesis Expert`;
+    case 'VISUAL':
+      return `Master Prompt Engineer & AI Generative Art Director`;
+    case 'ARCHITECT':
+      return `Principal Distributed Systems Architect & ${techLead}Engineer`;
+    default:
+      return domain.defaultRole || `Senior ${techLead}${domain.name} Specialist`;
+  }
+}
+
+function synthesizeObjective(rawPrompt, intent, nouns, tech) {
+  const techText = tech.length > 0 ? ` using ${tech.join(', ')}` : '';
+  const cleanPrompt = rawPrompt.replace(/^(can you|please|help me|i want to|i need to|write a|create a|generate a)\s+/i, '');
+
+  switch (intent) {
+    case 'DEBUG':
+      return `Identify the root cause of the issue and provide a production-ready fix for: "${cleanPrompt}"${techText}.`;
+    case 'AUDIT':
+      return `Perform a comprehensive quality and security vulnerability audit for: "${cleanPrompt}"${techText}.`;
+    case 'REFACTOR':
+      return `Refactor and optimize the architecture, performance, and readability for: "${cleanPrompt}"${techText}.`;
+    case 'EXPLAIN':
+      return `Explain the underlying mechanics and core principles in simple, intuitive terms for: "${cleanPrompt}".`;
+    case 'SUMMARIZE':
+      return `Extract, synthesize, and structure the key actionable takeaways and active-recall notes for: "${cleanPrompt}".`;
+    case 'VISUAL':
+      return `Generate a detailed visual prompt with lighting, framing, lens, and mood parameters for: "${cleanPrompt}".`;
+    case 'ARCHITECT':
+      return `Design a scalable, resilient system architecture and schema migration plan for: "${cleanPrompt}"${techText}.`;
+    default:
+      return `Engineer a high-performance, production-ready solution for: "${cleanPrompt}"${techText}.`;
+  }
+}
+
+function synthesizeDeliverables(domainId, intent, nouns, tech) {
+  const deliverables = [];
+
+  if (intent === 'DEBUG') {
+    deliverables.push('Root-Cause Diagnosis: Clearly state why the failure occurs before offering code modifications.');
+    deliverables.push('Production-Ready Fix: Provide fully functional, bug-free code with explicit error handling.');
+    deliverables.push('Verification Steps: Outline precise commands/tests to verify the resolution.');
+    return deliverables;
+  }
+
+  if (intent === 'AUDIT') {
+    deliverables.push('Risk Rating: Grade all identified risks by severity (CRITICAL, HIGH, MEDIUM, LOW).');
+    deliverables.push('Remediation Patches: Provide executable code patches for every vulnerability found.');
+    deliverables.push('Compliance Check: Align findings with OWASP Top 10 and security best practices.');
+    return deliverables;
+  }
+
+  if (intent === 'REFACTOR') {
+    deliverables.push('SOLID Architecture: Decompose monolithic functions into modular, clean components.');
+    deliverables.push('Performance Optimization: Minimize algorithmic complexity and unnecessary object allocations.');
+    deliverables.push('Before vs After Comparison: Highlight structural improvements clearly.');
+    return deliverables;
+  }
+
+  if (intent === 'EXPLAIN') {
+    deliverables.push('Plain-Language Breakdown: Explain concepts clearly without academic jargon.');
+    deliverables.push('Intuitive Mental Model: Use an everyday analogy to ground the explanation.');
+    deliverables.push('Top 3 Misconceptions: Highlight common pitfalls learners encounter.');
+    return deliverables;
+  }
+
+  if (intent === 'VISUAL') {
+    deliverables.push('Subject & Composition: Detail focal subject, spatial positioning, and atmosphere.');
+    deliverables.push('Camera & Lighting: Specify lens specs (e.g. 85mm f/1.4), volumetric lighting, and color grading.');
+    deliverables.push('Model Parameters: Append generator flags (e.g. `--ar 16:9 --v 6.0 --style raw`).');
+    return deliverables;
+  }
+
+  // Domain Fallback
+  if (domainId.startsWith('coding')) {
+    deliverables.push('Runnable Source Code: Provide functional, copy-paste ready code without unwritten placeholders.');
+    deliverables.push('Production Hygiene: Include sanitization, type-safety, and environment isolation.');
+  } else if (domainId.startsWith('study')) {
+    deliverables.push('Structured Notes: Format with clear hierarchy, bold terms, and summary bullet points.');
+    deliverables.push('Self-Test Questions: Include at least 3 active-recall questions to test comprehension.');
+  } else {
+    deliverables.push('Actionable Deliverables: Provide immediate, high-value outputs ready for execution.');
+    deliverables.push('Structured Formatting: Use clean Markdown headers and organized bullet points.');
+  }
+
+  return deliverables;
+}
+
+function synthesizeGuardrails(domainId, intent) {
+  const guardrails = [
+    'Avoid conversational filler, fluff, or generic introductory phrases.',
+    'Deliver concrete, high-leverage outputs ready for instant execution.'
+  ];
+
+  if (intent === 'DEBUG' || intent === 'REFACTOR') {
+    guardrails.push('Avoid band-aid fixes; resolve issues at the architectural root level.');
+    guardrails.push('Ensure changes introduce zero regressions or side-effects.');
+  } else if (domainId.startsWith('coding')) {
+    guardrails.push('Do not output incomplete placeholder functions like `// TODO: implement later`.');
+  } else if (domainId.startsWith('writing')) {
+    guardrails.push('Avoid cliché AI openers like "In today\'s fast-paced digital world...".');
+  }
+
+  return guardrails;
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
