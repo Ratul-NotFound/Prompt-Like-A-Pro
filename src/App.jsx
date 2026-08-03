@@ -19,12 +19,12 @@ export default function App() {
   const [tunerSettings, setTunerSettings] = useState({});
   const [isEnhancing, setIsEnhancing] = useState(false);
 
-  // LocalStorage Persistence
-  const [apiKey, setApiKey] = useState(() => {
-    const envKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-    if (envKey) return envKey;
-    return localStorage.getItem('prompt_pro_gemini_key') || '';
-  });
+  // Multi-Provider Proxy Mode (Always active, no manual key needed)
+  const apiKey = '';
+
+  useEffect(() => {
+    localStorage.removeItem('prompt_pro_gemini_key');
+  }, []);
   const [selectedModel, setSelectedModel] = useState(() => {
     const saved = localStorage.getItem('prompt_pro_gemini_model');
     if (saved && (saved === 'gemini-2.5-pro' || saved === 'gemini-2.5-flash')) return saved;
@@ -44,10 +44,6 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false);
   const [showVariableModal, setShowVariableModal] = useState(false);
   const [toast, setToast] = useState(null);
-
-  useEffect(() => {
-    localStorage.setItem('prompt_pro_gemini_key', apiKey);
-  }, [apiKey]);
 
   useEffect(() => {
     localStorage.setItem('prompt_pro_gemini_model', selectedModel);

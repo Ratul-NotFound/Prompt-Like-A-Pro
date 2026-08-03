@@ -9,9 +9,6 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
 
   const handleSave = (e) => {
     e.preventDefault();
-    if (!isEnvKeyDefined) {
-      onSaveApiKey(inputKey.trim());
-    }
     onSaveModel(model);
     onClose();
   };
@@ -54,54 +51,21 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
             </p>
           </div>
 
-          {/* Environment Variable Check / Input */}
+          {/* Multi-Provider Engine Status */}
           <div className="input-group" style={{ marginTop: '0.5rem' }}>
-            <label className="input-label">Google Gemini API Key</label>
-            {isEnvKeyDefined ? (
-              <div className="env-detected-block">
-                <div className="status-indicator" style={{ background: 'rgba(16, 185, 129, 0.05)', marginLeft: 0 }}>
-                  <span className="status-dot active" />
-                  <span className="status-text" style={{ color: '#10B981', fontWeight: 600 }}>Active via .env file</span>
-                </div>
-                <p className="env-help">To update or remove this key, modify the <code>VITE_GEMINI_API_KEY</code> variable in your local <code>.env</code> file.</p>
+            <label className="input-label">Multi-Provider AI Rotation Engine</label>
+            <div className="env-detected-block">
+              <div className="status-indicator" style={{ background: 'rgba(16, 185, 129, 0.08)', marginLeft: 0, padding: '0.4rem 0.6rem', borderRadius: '4px' }}>
+                <span className="status-dot active" />
+                <span className="status-text" style={{ color: '#10B981', fontWeight: 600 }}>Active (Server & Local .env Keys)</span>
               </div>
-            ) : (
-              <>
-                <input
-                  type="password"
-                  className="tuner-input"
-                  placeholder="AIzaSy..."
-                  value={inputKey}
-                  onChange={(e) => setInputKey(e.target.value)}
-                />
-                <p className="key-help">
-                  Get a free API Key from{' '}
-                  <a 
-                    href="https://aistudio.google.com/app/apikey" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="link"
-                  >
-                    Google AI Studio <ExternalLink size={12} />
-                  </a>
-                </p>
-              </>
-            )}
+              <p className="env-help">
+                Zero setup required! The app automatically rotates across free tier tokens from <strong>Google Gemini</strong>, <strong>Groq Cloud</strong>, <strong>OpenRouter</strong>, and <strong>Hugging Face</strong>.
+              </p>
+            </div>
           </div>
 
           <div className="modal-actions" style={{ marginTop: '1.25rem' }}>
-            {!isEnvKeyDefined && apiKey && (
-              <button 
-                type="button" 
-                className="btn btn-ghost btn-sm text-rose"
-                onClick={() => {
-                  onSaveApiKey('');
-                  setInputKey('');
-                }}
-              >
-                Clear Key
-              </button>
-            )}
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
