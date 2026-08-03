@@ -92,6 +92,19 @@ export default function App() {
       }
 
       setEnhancedResult(resultObj);
+
+      // Auto-save every enhanced prompt directly into LocalStorage History
+      if (resultObj?.enhancedText) {
+        const historyItem = {
+          id: Date.now(),
+          domainId: selectedDomain.id,
+          domainName: selectedDomain.name,
+          rawPrompt: rawInput,
+          enhancedText: resultObj.enhancedText,
+          timestamp: new Date().toISOString()
+        };
+        setHistory(prev => [historyItem, ...prev.filter(i => i.rawPrompt !== rawInput).slice(0, 49)]);
+      }
     } catch (err) {
       showToast(err.message || 'Failed to enhance prompt', 'error');
     } finally {
@@ -130,7 +143,7 @@ export default function App() {
       timestamp: new Date().toISOString()
     };
 
-    setHistory(prev => [historyItem, ...prev.slice(0, 49)]);
+    setHistory(prev => [historyItem, ...prev.filter(i => i.id !== historyItem.id).slice(0, 49)]);
     showToast('Prompt saved to History!', 'info');
   };
 
@@ -153,8 +166,6 @@ export default function App() {
     <div className="app-layout">
       {/* Navigation Header */}
       <Navbar
-        hasApiKey={Boolean(apiKey)}
-        onOpenSettings={() => setShowSettings(true)}
         onOpenGuide={() => setShowGuide(true)}
         onToggleHistory={() => setShowHistory(true)}
       />
@@ -180,7 +191,7 @@ export default function App() {
           }}
           onEnhance={handleEnhance}
           isEnhancing={isEnhancing}
-          hasApiKey={Boolean(apiKey)}
+          hasApiKey={false}
           onCopy={handleCopyPrompt}
           onOpenVariableModal={() => setShowVariableModal(true)}
           onSaveToHistory={handleSaveToHistory}
@@ -190,11 +201,9 @@ export default function App() {
       {/* Footer */}
       <footer className="app-footer">
         <div className="footer-content">
-          <p>© {new Date().getFullYear()} <strong>Prompt Like A Pro</strong>. Empowering developers, students, and creators with engineered prompts.</p>
+          <p>© {new Date().getFullYear()} <strong>Prompt Like A Pro</strong>. Made with ❤️ by <a href="https://mh-ratul.vercel.app/" target="_blank" rel="noreferrer" className="footer-author-link">Ratul</a>.</p>
           <div className="footer-links">
             <button className="footer-link-btn" onClick={() => setShowGuide(true)}>Prompting Guide</button>
-            <span>•</span>
-            <button className="footer-link-btn" onClick={() => setShowSettings(true)}>API Settings</button>
             <span>•</span>
             <a href="https://github.com/Ratul-NotFound/Prompt-Like-A-Pro" target="_blank" rel="noreferrer" className="footer-link-btn">GitHub</a>
           </div>
@@ -239,19 +248,20 @@ export default function App() {
             color: var(--text-primary);
             text-decoration: underline;
           }
+
+          .footer-author-link {
+            color: #10B981;
+            font-weight: 600;
+            text-decoration: none;
+          }
+
+          .footer-author-link:hover {
+            text-decoration: underline;
+          }
         `}</style>
       </footer>
 
       {/* Modals & Drawers */}
-      {showSettings && (
-        <SettingsModal
-          apiKey={apiKey}
-          onSaveApiKey={setApiKey}
-          selectedModel={selectedModel}
-          onSaveModel={setSelectedModel}
-          onClose={() => setShowSettings(false)}
-        />
-      )}
 
       {showGuide && (
         <PromptGuideModal onClose={() => setShowGuide(false)} />

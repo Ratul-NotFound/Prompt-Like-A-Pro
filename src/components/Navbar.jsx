@@ -31,24 +31,15 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
             <span>History</span>
           </button>
 
-          <button 
-            className="nav-link-btn"
-            onClick={onOpenSettings}
-            title="API Settings"
-          >
-            <Settings size={13} />
-            <span>Settings</span>
-          </button>
-
           <div className="nav-divider" />
 
           {/* Minimal Status Dot on the right */}
           <div 
-            className={`engine-status-tag ${hasApiKey ? 'active' : ''}`}
-            title={hasApiKey ? 'Gemini AI API Connected' : 'Local Heuristic Engine'}
+            className="engine-status-tag active"
+            title="Multi-Provider AI Rotation Pool Active"
           >
             <span className="status-dot-core" />
-            <span className="status-dot-label">{hasApiKey ? 'GEMINI' : 'LOCAL'}</span>
+            <span className="status-dot-label">AI ENGINE</span>
           </div>
 
           <a 
