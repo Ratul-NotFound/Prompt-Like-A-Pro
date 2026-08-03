@@ -43,6 +43,7 @@ export default function App() {
   const [showGuide, setShowGuide] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showVariableModal, setShowVariableModal] = useState(false);
+  const [toast, setToast] = useState(null);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('prompt_pro_theme') || 'dark';
   });
