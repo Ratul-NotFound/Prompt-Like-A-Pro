@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DOMAINS } from './data/domains';
-import { enhancePrompt } from './utils/enhancerEngine';
+import { enhancePrompt, extractVariables } from './utils/enhancerEngine';
 import { enhancePromptWithGemini } from './utils/geminiApi';
 
 import Navbar from './components/Navbar';
@@ -79,7 +79,7 @@ export default function App() {
               text: apiResponse.text 
             }
           ],
-          variables: [],
+          variables: extractVariables(apiResponse.text),
           tokenCount: Math.ceil(apiResponse.text.length / 4),
           rawTokenCount: Math.ceil(rawInput.length / 4)
         };
