@@ -43,7 +43,18 @@ export default function App() {
   const [showGuide, setShowGuide] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showVariableModal, setShowVariableModal] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('prompt_pro_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('prompt_pro_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   useEffect(() => {
     localStorage.setItem('prompt_pro_gemini_model', selectedModel);
@@ -166,6 +177,8 @@ export default function App() {
     <div className="app-layout">
       {/* Navigation Header */}
       <Navbar
+        theme={theme}
+        onToggleTheme={toggleTheme}
         onOpenGuide={() => setShowGuide(true)}
         onToggleHistory={() => setShowHistory(true)}
       />

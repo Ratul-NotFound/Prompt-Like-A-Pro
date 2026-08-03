@@ -1,7 +1,7 @@
 import React from 'react';
-import { Settings, BookOpen, History, Github } from 'lucide-react';
+import { Sun, Moon, BookOpen, History, Github } from 'lucide-react';
 
-export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey }) {
+export default function Navbar({ onOpenGuide, onToggleHistory, theme, onToggleTheme }) {
   return (
     <header className="navbar-container">
       <div className="navbar-inner">
@@ -13,6 +13,15 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
 
         {/* Minimalist Navigation Actions */}
         <div className="navbar-actions">
+          <button 
+            className="nav-link-btn"
+            onClick={onToggleTheme}
+            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+          >
+            {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+            <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
+          </button>
+
           <button 
             className="nav-link-btn"
             onClick={onOpenGuide}
@@ -60,8 +69,9 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           top: 0;
           z-index: 900;
           width: 100%;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-          background: #0B0C10; /* Merges completely with the main page background */
+          border-bottom: 1px solid var(--border-subtle);
+          background: var(--bg-dark);
+          transition: background-color 200ms ease, border-color 200ms ease;
         }
 
         .navbar-inner {
@@ -83,13 +93,13 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #FFFFFF;
+          background: var(--text-primary);
         }
 
         .brand-title {
           font-size: 0.775rem;
           font-weight: 700;
-          color: #FFFFFF;
+          color: var(--text-primary);
           letter-spacing: 0.15em;
         }
 
@@ -115,13 +125,13 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
         }
 
         .nav-link-btn:hover {
-          color: #FFFFFF;
+          color: var(--text-primary);
         }
 
         .nav-divider {
           width: 1px;
           height: 12px;
-          background: rgba(255, 255, 255, 0.08);
+          background: var(--border-medium);
         }
 
         /* Minimal Status Indicator */
@@ -159,7 +169,7 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
         }
 
         .github-nav-link:hover {
-          color: #FFFFFF;
+          color: var(--text-primary);
         }
 
         @media (max-width: 640px) {
