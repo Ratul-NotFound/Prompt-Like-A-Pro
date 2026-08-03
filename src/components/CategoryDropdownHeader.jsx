@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DOMAINS, CATEGORIES } from '../data/domains';
+import { DOMAINS } from '../data/domains';
 import { 
   ChevronDown, 
   Check, 
@@ -32,17 +32,16 @@ const ICON_MAP = {
 };
 
 const CATEGORY_META = {
-  Coding: { icon: Code, color: '#6366F1', label: 'Coding & Tech' },
-  Study: { icon: BookOpen, color: '#06B6D4', label: 'Study & Academics' },
-  Writing: { icon: PenTool, color: '#3B82F6', label: 'Content Writing' },
-  Visuals: { icon: Sparkles, color: '#14B8A6', label: 'AI Image Prompts' },
-  'AI Systems': { icon: Cpu, color: '#8B5CF6', label: 'AI System Prompts' }
+  Coding: { icon: Code, label: 'Coding & Tech' },
+  Study: { icon: BookOpen, label: 'Study & Academics' },
+  Writing: { icon: PenTool, label: 'Content Writing' },
+  Visuals: { icon: Sparkles, label: 'AI Image Prompts' },
+  'AI Systems': { icon: Cpu, label: 'AI System Prompts' }
 };
 
 export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain }) {
   const [openCategory, setOpenCategory] = useState(null);
 
-  // Group domains by main category
   const mainCategories = ['Coding', 'Study', 'Writing', 'Visuals', 'AI Systems'];
 
   const toggleDropdown = (cat) => {
@@ -53,55 +52,44 @@ export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain 
     <section className="category-header-section">
       <div className="section-title-bar">
         <div>
-          <h2 className="header-main-title">Select Scenario Category & Subcategory</h2>
-          <p className="header-sub-title">Pick a category below to open subcategory options and load domain-specific prompt engineering rules.</p>
+          <h2 className="header-main-title">Scenario Blueprint</h2>
+          <p className="header-sub-title">Select a category and subcategory to load domain-specific rules and persona constraints.</p>
         </div>
 
         {/* Active Selection Badge */}
-        <div className="active-selection-pill" style={{ borderColor: `${selectedDomain.color}50`, background: `${selectedDomain.color}15` }}>
-          <span className="pill-dot" style={{ background: selectedDomain.color }} />
-          <span className="pill-text" style={{ color: selectedDomain.color }}>
-            Active: <strong>{selectedDomain.name}</strong>
+        <div className="active-selection-pill">
+          <span className="pill-text">
+            Active: <strong>{selectedDomain.name}</strong> ({selectedDomain.badge})
           </span>
         </div>
       </div>
 
-      {/* Categories Cards & Dropdown Row */}
-      <div className="category-cards-grid">
+      {/* Category Dropdown Navigation Row */}
+      <div className="category-tabs-grid">
         {mainCategories.map((catKey) => {
-          const meta = CATEGORY_META[catKey] || { icon: Code, color: '#6366F1', label: catKey };
+          const meta = CATEGORY_META[catKey] || { icon: Code, label: catKey };
           const CatIcon = meta.icon;
           const categoryDomains = DOMAINS.filter(d => d.category === catKey);
           const isOpen = openCategory === catKey;
           const hasSelectedChild = categoryDomains.some(d => d.id === selectedDomain.id);
 
           return (
-            <div key={catKey} className={`cat-card-wrapper ${isOpen ? 'dropdown-open' : ''}`}>
-              {/* Category Card Header Button */}
+            <div key={catKey} className="cat-card-wrapper">
               <button
-                className={`cat-card-button glass-card ${hasSelectedChild ? 'active-parent' : ''}`}
+                className={`cat-card-button ${hasSelectedChild ? 'active-parent' : ''}`}
                 onClick={() => toggleDropdown(catKey)}
-                style={{ '--cat-color': meta.color }}
               >
                 <div className="cat-card-left">
-                  <div className="cat-icon-box" style={{ background: `${meta.color}1A`, color: meta.color }}>
-                    <CatIcon size={18} />
-                  </div>
-                  <div className="cat-label-group">
-                    <span className="cat-name">{meta.label}</span>
-                    <span className="cat-count">{categoryDomains.length} Subcategories</span>
-                  </div>
+                  <CatIcon size={16} className="cat-icon" />
+                  <span className="cat-name">{meta.label}</span>
                 </div>
-
-                <div className="cat-card-right">
-                  <ChevronDown size={16} className={`chevron-icon ${isOpen ? 'rotated' : ''}`} />
-                </div>
+                <ChevronDown size={14} className={`chevron-icon ${isOpen ? 'rotated' : ''}`} />
               </button>
 
-              {/* Subcategories Dropdown Menu */}
+              {/* Subcategory Dropdown */}
               {isOpen && (
-                <div className="subcategory-dropdown glass-card animate-fade-in">
-                  <div className="dropdown-title">Select Subcategory:</div>
+                <div className="subcategory-dropdown animate-fade-in">
+                  <div className="dropdown-header-text">Subcategory Blueprint:</div>
                   <div className="subcategory-list">
                     {categoryDomains.map((subDomain) => {
                       const SubIcon = ICON_MAP[subDomain.icon] || Sparkles;
@@ -116,17 +104,12 @@ export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain 
                             setOpenCategory(null);
                           }}
                         >
-                          <div className="sub-icon-box" style={{ color: subDomain.color }}>
-                            <SubIcon size={16} />
-                          </div>
+                          <SubIcon size={15} className="sub-icon" />
                           <div className="sub-info">
                             <span className="sub-name">{subDomain.name}</span>
                             <span className="sub-desc">{subDomain.description}</span>
                           </div>
-
-                          {isSubSelected && (
-                            <Check size={16} className="sub-check" style={{ color: subDomain.color }} />
-                          )}
+                          {isSubSelected && <Check size={14} className="sub-check" />}
                         </div>
                       );
                     })}
@@ -140,51 +123,53 @@ export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain 
 
       <style>{`
         .category-header-section {
-          margin-bottom: 1.75rem;
+          margin-bottom: 1.5rem;
         }
 
         .section-title-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 1rem;
+          margin-bottom: 0.85rem;
           gap: 1rem;
           flex-wrap: wrap;
         }
 
         .header-main-title {
-          font-size: 1.2rem;
+          font-size: 1.1rem;
           font-weight: 700;
           color: var(--text-primary);
           letter-spacing: -0.01em;
         }
 
         .header-sub-title {
-          font-size: 0.825rem;
+          font-size: 0.8rem;
           color: var(--text-muted);
-          margin-top: 0.15rem;
         }
 
         .active-selection-pill {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.35rem 0.85rem;
-          border-radius: var(--radius-full);
-          border: 1px solid;
-          font-size: 0.8rem;
+          padding: 0.25rem 0.75rem;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border-medium);
+          background: var(--bg-surface);
+          font-size: 0.775rem;
         }
 
-        .pill-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
+        .pill-text {
+          color: var(--text-secondary);
         }
 
-        .category-cards-grid {
+        .pill-text strong {
+          color: var(--text-primary);
+        }
+
+        .category-tabs-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1rem;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 0.75rem;
         }
 
         .cat-card-wrapper {
@@ -196,54 +181,44 @@ export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain 
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.85rem 1rem;
-          border-radius: var(--radius-md);
+          padding: 0.65rem 0.85rem;
+          border-radius: var(--radius-sm);
           cursor: pointer;
-          border: 1px solid var(--border-subtle);
+          border: 1px solid var(--border-medium);
           background: var(--bg-surface);
+          color: var(--text-secondary);
           transition: all var(--transition-fast);
         }
 
         .cat-card-button:hover {
           background: var(--bg-surface-hover);
-          border-color: var(--border-medium);
+          color: var(--text-primary);
+          border-color: #484F58;
         }
 
         .cat-card-button.active-parent {
-          border-color: var(--cat-color);
-          box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+          background: var(--bg-subtle);
+          color: var(--text-primary);
+          border-color: var(--border-active);
         }
 
         .cat-card-left {
           display: flex;
           align-items: center;
-          gap: 0.65rem;
+          gap: 0.5rem;
         }
 
-        .cat-icon-box {
-          width: 32px;
-          height: 32px;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .cat-icon {
+          color: var(--text-muted);
         }
 
-        .cat-label-group {
-          display: flex;
-          flex-direction: column;
-          text-align: left;
+        .active-parent .cat-icon {
+          color: var(--accent-blue);
         }
 
         .cat-name {
-          font-size: 0.875rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .cat-count {
-          font-size: 0.725rem;
-          color: var(--text-muted);
+          font-size: 0.85rem;
+          font-weight: 600;
         }
 
         .chevron-icon {
@@ -255,59 +230,63 @@ export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain 
           transform: rotate(180deg);
         }
 
-        /* Subcategory Dropdown Menu */
+        /* Subcategory Dropdown */
         .subcategory-dropdown {
           position: absolute;
-          top: calc(100% + 8px);
+          top: calc(100% + 4px);
           left: 0;
           right: 0;
-          min-width: 280px;
+          min-width: 260px;
           z-index: 100;
           background: var(--bg-surface);
           border: 1px solid var(--border-medium);
           border-radius: var(--radius-md);
-          padding: 0.75rem;
-          box-shadow: var(--shadow-lg);
+          padding: 0.5rem;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
-        .dropdown-title {
-          font-size: 0.725rem;
+        .dropdown-header-text {
+          font-size: 0.7rem;
           font-weight: 700;
           color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.04em;
-          margin-bottom: 0.5rem;
-          padding-left: 0.35rem;
+          padding: 0.25rem 0.5rem;
+          margin-bottom: 0.25rem;
         }
 
         .subcategory-list {
           display: flex;
           flex-direction: column;
-          gap: 0.35rem;
+          gap: 0.2rem;
         }
 
         .subcategory-item {
           display: flex;
           align-items: center;
-          gap: 0.65rem;
-          padding: 0.6rem 0.75rem;
-          border-radius: 6px;
+          gap: 0.5rem;
+          padding: 0.45rem 0.5rem;
+          border-radius: var(--radius-sm);
           cursor: pointer;
           transition: background var(--transition-fast);
         }
 
         .subcategory-item:hover {
-          background: rgba(255, 255, 255, 0.05);
+          background: var(--bg-subtle);
         }
 
         .subcategory-item.selected {
-          background: rgba(99, 102, 241, 0.12);
+          background: #1F242C;
+          border: 1px solid rgba(88, 166, 255, 0.2);
         }
 
-        .sub-icon-box {
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .sub-icon {
+          color: var(--text-muted);
+          flex-shrink: 0;
+        }
+
+        .selected .sub-icon {
+          color: var(--accent-blue);
         }
 
         .sub-info {
@@ -317,29 +296,32 @@ export default function CategoryDropdownHeader({ selectedDomain, onSelectDomain 
         }
 
         .sub-name {
-          font-size: 0.825rem;
-          font-weight: 700;
+          font-size: 0.8rem;
+          font-weight: 600;
           color: var(--text-primary);
         }
 
         .sub-desc {
-          font-size: 0.725rem;
+          font-size: 0.7rem;
           color: var(--text-muted);
-          line-height: 1.3;
           display: -webkit-box;
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
 
+        .sub-check {
+          color: var(--accent-blue);
+        }
+
         @media (max-width: 640px) {
-          .category-cards-grid {
+          .category-tabs-grid {
             grid-template-columns: 1fr;
           }
           .subcategory-dropdown {
             position: relative;
             top: 0;
-            margin-top: 0.5rem;
+            margin-top: 0.35rem;
           }
         }
       `}</style>

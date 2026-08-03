@@ -1,58 +1,48 @@
 /* ==========================================================================
-   Prompt Like A Pro — Design System & Global Styles
-   Inspired by Linear.app, Vercel, and Raycast interfaces.
+   Prompt Like A Pro — Enterprise Developer Tool Design System
+   Minimalist, Clean, High-Legibility UI (GitHub / Vercel / Linear Inspired)
    ========================================================================== */
 
 :root {
-  /* Color Tokens */
-  --bg-dark: #080B11;
-  --bg-surface: #0F1623;
-  --bg-surface-hover: #162032;
-  --bg-glass: rgba(15, 22, 35, 0.75);
-  --bg-glass-card: rgba(22, 32, 50, 0.45);
-  --bg-input: #0B101A;
+  /* Enterprise Slate Palette */
+  --bg-dark: #0D1117;
+  --bg-surface: #161B22;
+  --bg-surface-hover: #1C2128;
+  --bg-input: #010409;
+  --bg-subtle: #21262D;
 
-  /* Border Tokens */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-focus: #6366F1;
+  /* Crisp Borders */
+  --border-subtle: #21262D;
+  --border-medium: #30363D;
+  --border-active: #58A6FF;
 
-  /* Accent Tokens */
-  --accent-primary: #6366F1;
-  --accent-primary-hover: #4F46E5;
-  --accent-secondary: #8B5CF6;
-  --accent-emerald: #10B981;
-  --accent-cyan: #06B6D4;
-  --accent-amber: #F59E0B;
-  --accent-rose: #F43F5E;
+  /* Refined Accent Tokens (Minimal & Functional) */
+  --accent-primary: #238636;        /* Enterprise Green action */
+  --accent-primary-hover: #2EA043;
+  --accent-blue: #58A6FF;           /* Developer Blue focus */
+  --accent-purple: #A371F7;
+  --accent-amber: #D29922;
+  --accent-rose: #F85149;
 
-  /* Text Tokens */
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --text-disabled: #475569;
+  /* Neutral Text Tokens */
+  --text-primary: #F0F6FC;
+  --text-secondary: #8B949E;
+  --text-muted: #6E7681;
 
   /* Typography */
-  --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
 
-  /* Shadows & Glows */
-  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.18);
-  --shadow-emerald-glow: 0 0 20px rgba(16, 185, 129, 0.2);
-
-  /* Radius Tokens */
+  /* Clean Radius & Transitions */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 9999px;
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Reset & Box Sizing */
+/* Reset & Base Setup */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -68,13 +58,12 @@ html, body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
-/* Custom Scrollbar */
+/* Custom Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -82,50 +71,16 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  background: #30363D;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: #484F58;
 }
 
-/* Background Atmosphere Glows */
-.ambient-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.ambient-glow-1 {
-  position: absolute;
-  top: -10%;
-  left: 20%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
-  filter: blur(80px);
-}
-
-.ambient-glow-2 {
-  position: absolute;
-  bottom: 10%;
-  right: 15%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
-  filter: blur(100px);
-}
-
-/* Main Container Layout */
+/* App Layout */
 .app-layout {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -133,7 +88,7 @@ html, body {
 
 .main-content {
   flex: 1;
-  max-width: 1440px;
+  max-width: 1280px;
   width: 100%;
   margin: 0 auto;
   padding: 1.5rem 1.5rem 3rem 1.5rem;
@@ -141,55 +96,67 @@ html, body {
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 1rem 1rem 2rem 1rem;
+    padding: 1rem;
   }
 }
 
-/* Glassmorphism Card Utility */
+/* Clean Enterprise Card Surface */
 .glass-card {
-  background: var(--bg-glass-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
 }
 
 .glass-card:hover {
-  border-color: var(--border-medium);
+  border-color: #484F58;
 }
 
-/* Button Variants */
+/* Crisp Enterprise Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   font-family: var(--font-ui);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.625rem 1.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
   user-select: none;
 }
 
+.btn:hover {
+  background: #30363D;
+  border-color: #8B949E;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: var(--accent-primary);
+  border-color: rgba(240, 246, 252, 0.1);
   color: #FFFFFF;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
-  transform: translateY(-1px);
+  background: var(--accent-primary-hover);
+  border-color: rgba(240, 246, 252, 0.2);
 }
 
-.btn-primary:active {
-  transform: translateY(0);
+.btn-primary:disabled {
+  background: #21262D;
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+  cursor: not-allowed;
 }
 
 .btn-secondary {
@@ -198,111 +165,103 @@ html, body {
   border-color: var(--border-medium);
 }
 
-.btn-secondary:hover {
-  background: var(--bg-surface-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
 .btn-ghost {
   background: transparent;
+  border-color: transparent;
   color: var(--text-secondary);
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-subtle);
   color: var(--text-primary);
 }
 
-.btn-emerald {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  color: #FFFFFF;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
-}
-
-.btn-emerald:hover {
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-  transform: translateY(-1px);
-}
-
 .btn-sm {
-  padding: 0.375rem 0.75rem;
+  padding: 0.35rem 0.65rem;
   font-size: 0.775rem;
 }
 
-/* Badge / Pill styling */
+.btn-emerald {
+  background: #1F6FEB;
+  border-color: #388BFD;
+  color: #FFFFFF;
+}
+
+.btn-emerald:hover {
+  background: #388BFD;
+}
+
+/* Minimal Badges */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.6rem;
+  gap: 0.3rem;
+  padding: 0.15rem 0.5rem;
   border-radius: var(--radius-full);
   font-size: 0.725rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
 }
 
 .badge-indigo {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818CF8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(88, 166, 255, 0.1);
+  color: var(--accent-blue);
+  border-color: rgba(88, 166, 255, 0.3);
 }
 
 .badge-emerald {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34D399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(46, 160, 67, 0.15);
+  color: #3FB950;
+  border-color: rgba(46, 160, 67, 0.3);
 }
 
 .badge-cyan {
-  background: rgba(6, 182, 212, 0.15);
-  color: #22D3EE;
-  border: 1px solid rgba(6, 182, 212, 0.3);
+  background: rgba(163, 113, 247, 0.15);
+  color: #D2A8FF;
+  border-color: rgba(163, 113, 247, 0.3);
 }
 
-/* Diff View Highlights */
+/* Clean Diff Highlighting */
 .diff-added {
-  background-color: rgba(16, 185, 129, 0.12);
-  border-left: 3px solid #10B981;
-  padding: 0.25rem 0.5rem;
-  margin: 0.25rem 0;
-  border-radius: 0 4px 4px 0;
+  background: rgba(46, 160, 67, 0.1);
+  border-left: 3px solid #3FB950;
+  padding: 0.5rem 0.75rem;
+  margin: 0.35rem 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .diff-tag {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #34D399;
+  color: #3FB950;
   text-transform: uppercase;
   margin-right: 0.5rem;
+  font-family: var(--font-mono);
 }
 
-/* Variable highlight inside text */
+/* Variable Chips */
 .var-chip {
-  background: rgba(139, 92, 246, 0.2);
-  color: #C084FC;
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  padding: 0.1rem 0.4rem;
+  background: rgba(88, 166, 255, 0.15);
+  color: #79C0FF;
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  padding: 0.1rem 0.35rem;
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 0.85em;
+  font-size: 0.8em;
 }
 
-/* Animations */
+/* Minimal Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-fade-in {
-  animation: fadeIn 200ms ease-out forwards;
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  animation: fadeIn 150ms ease-out forwards;
 }
 
 .animate-slide-right {
-  animation: slideInRight 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 150ms ease-out forwards;
 }

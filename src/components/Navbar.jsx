@@ -1,19 +1,17 @@
 import React from 'react';
-import { Zap, Key, BookOpen, History, Github, ExternalLink } from 'lucide-react';
+import { Terminal, Key, BookOpen, History, Github } from 'lucide-react';
 
 export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, hasApiKey }) {
   return (
     <header className="navbar-container">
-      <div className="navbar-inner glass-card">
-        {/* Brand Logo */}
+      <div className="navbar-inner">
+        {/* Brand Title */}
         <div className="brand-group">
           <div className="brand-icon">
-            <Zap size={22} className="brand-glow-icon" />
+            <Terminal size={18} />
           </div>
           <div className="brand-text">
-            <h1 className="brand-title">
-              Prompt<span className="brand-gradient">Like A Pro</span>
-            </h1>
+            <h1 className="brand-title">Prompt Like A Pro</h1>
             <span className="brand-tagline">AI Engineering Workbench</span>
           </div>
         </div>
@@ -23,94 +21,86 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
           <button 
             className="btn btn-ghost btn-sm"
             onClick={onOpenGuide}
-            title="Prompt Engineering Cheat Sheet & Guide"
+            title="Prompting Guide"
           >
-            <BookOpen size={16} />
+            <BookOpen size={14} />
             <span className="hide-mobile">Guide</span>
           </button>
 
           <button 
             className="btn btn-ghost btn-sm"
             onClick={onToggleHistory}
-            title="Saved & Recent Prompts History"
+            title="Prompt History"
           >
-            <History size={16} />
+            <History size={14} />
             <span className="hide-mobile">History</span>
           </button>
 
           <button 
             className={`btn btn-sm ${hasApiKey ? 'btn-emerald' : 'btn-secondary'}`}
             onClick={onOpenSettings}
-            title="Configure Gemini API Key for Live Meta-Prompting"
+            title="API Settings"
           >
-            <Key size={16} />
-            <span>{hasApiKey ? 'AI API Active' : 'Set API Key'}</span>
+            <Key size={14} />
+            <span>{hasApiKey ? 'API Active' : 'API Key'}</span>
           </button>
 
           <a 
             href="https://github.com/Ratul-NotFound/Prompt-Like-A-Pro"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-ghost btn-sm github-btn"
-            title="View Source on GitHub"
+            className="btn btn-ghost btn-sm"
+            title="GitHub Repository"
           >
-            <Github size={18} />
-            <span className="hide-mobile">GitHub</span>
+            <Github size={16} />
           </a>
         </div>
       </div>
-      
+
       <style>{`
         .navbar-container {
           width: 100%;
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 1rem 1.5rem 0.5rem 1.5rem;
+          border-bottom: 1px solid var(--border-medium);
+          background: var(--bg-surface);
         }
 
         .navbar-inner {
+          max-width: 1280px;
+          margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.85rem 1.25rem;
-          border-radius: var(--radius-lg);
+          padding: 0.75rem 1.5rem;
         }
 
         .brand-group {
           display: flex;
           align-items: center;
-          gap: 0.85rem;
+          gap: 0.65rem;
         }
 
         .brand-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-          border: 1px solid rgba(99, 102, 241, 0.4);
+          width: 30px;
+          height: 30px;
+          border-radius: var(--radius-sm);
+          background: var(--bg-subtle);
+          border: 1px solid var(--border-medium);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--accent-primary);
-          box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+          color: var(--text-primary);
         }
 
         .brand-title {
-          font-size: 1.15rem;
-          font-weight: 800;
-          letter-spacing: -0.02em;
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--text-primary);
           line-height: 1.2;
-        }
-
-        .brand-gradient {
-          background: linear-gradient(135deg, #818CF8 0%, #C084FC 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          margin-left: 0.35rem;
+          letter-spacing: -0.01em;
         }
 
         .brand-tagline {
-          font-size: 0.725rem;
+          font-size: 0.7rem;
           color: var(--text-muted);
           font-weight: 500;
           display: block;
@@ -119,15 +109,15 @@ export default function Navbar({ onOpenSettings, onOpenGuide, onToggleHistory, h
         .navbar-actions {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.4rem;
         }
 
         @media (max-width: 640px) {
           .hide-mobile {
             display: none;
           }
-          .navbar-container {
-            padding: 0.75rem 1rem 0.25rem 1rem;
+          .navbar-inner {
+            padding: 0.65rem 1rem;
           }
         }
       `}</style>
