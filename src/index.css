@@ -1,48 +1,48 @@
 /* ==========================================================================
-   Prompt Like A Pro — Enterprise Developer Tool Design System
-   Minimalist, Clean, High-Legibility UI (GitHub / Vercel / Linear Inspired)
+   Prompt Like A Pro — Premium Studio UI/UX Design System
+   Inspired by Claude.ai, Gemini Advanced, and Stripe Dashboard
    ========================================================================== */
 
 :root {
-  /* Enterprise Slate Palette */
-  --bg-dark: #0D1117;
-  --bg-surface: #161B22;
-  --bg-surface-hover: #1C2128;
-  --bg-input: #010409;
-  --bg-subtle: #21262D;
+  /* Rich Obsidian Studio Palette */
+  --bg-dark: #0B0C10;
+  --bg-surface: #14151F;
+  --bg-surface-hover: #1C1E2B;
+  --bg-input: #0D0E14;
+  --bg-subtle: #1E2030;
 
-  /* Crisp Borders */
-  --border-subtle: #21262D;
-  --border-medium: #30363D;
-  --border-active: #58A6FF;
+  /* Precision Border Elements */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-active: #6366F1;
 
-  /* Refined Accent Tokens (Minimal & Functional) */
-  --accent-primary: #238636;        /* Enterprise Green action */
-  --accent-primary-hover: #2EA043;
-  --accent-blue: #58A6FF;           /* Developer Blue focus */
-  --accent-purple: #A371F7;
+  /* Accent Colors */
+  --accent-primary: #6366F1;
+  --accent-primary-hover: #4F46E5;
+  --accent-blue: #388BFD;
+  --accent-emerald: #3FB950;
   --accent-amber: #D29922;
   --accent-rose: #F85149;
 
-  /* Neutral Text Tokens */
-  --text-primary: #F0F6FC;
-  --text-secondary: #8B949E;
-  --text-muted: #6E7681;
+  /* Typography Colors */
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
 
-  /* Typography */
-  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+  /* Typography Fonts */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 
-  /* Clean Radius & Transitions */
+  /* Radius & Shadows */
   --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
 
-  --transition-fast: 120ms cubic-bezier(0.2, 0, 0, 1);
+  --shadow-lg: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  --transition-normal: 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Reset & Base Setup */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -60,7 +60,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Minimal Scrollbar */
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -71,15 +71,15 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #30363D;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #484F58;
+  background: rgba(255, 255, 255, 0.22);
 }
 
-/* App Layout */
+/* App Main Layout */
 .app-layout {
   display: flex;
   flex-direction: column;
@@ -88,81 +88,96 @@ html, body {
 
 .main-content {
   flex: 1;
-  max-width: 1280px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 3rem 1.5rem;
+  padding: 2rem 1.5rem 4rem 1.5rem;
 }
 
-@media (max-width: 768px) {
-  .main-content {
-    padding: 1rem;
+/* Playground Side-by-Side Layout */
+.playground-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .playground-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
-/* Clean Enterprise Card Surface */
+/* Cards & Surfaces */
 .glass-card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transition: border-color var(--transition-normal), background var(--transition-normal);
 }
 
 .glass-card:hover {
-  border-color: #484F58;
+  border-color: var(--border-medium);
 }
 
-/* Crisp Enterprise Buttons */
+/* World Class Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   font-family: var(--font-ui);
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   font-weight: 600;
-  padding: 0.5rem 0.9rem;
-  border-radius: var(--radius-sm);
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-full);
   border: 1px solid var(--border-medium);
   background: var(--bg-subtle);
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
   white-space: nowrap;
   user-select: none;
 }
 
 .btn:hover {
-  background: #30363D;
-  border-color: #8B949E;
+  background: var(--bg-surface-hover);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
 .btn:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .btn-primary {
-  background: var(--accent-primary);
-  border-color: rgba(240, 246, 252, 0.1);
-  color: #FFFFFF;
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #000000;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:hover {
-  background: var(--accent-primary-hover);
-  border-color: rgba(240, 246, 252, 0.2);
+  background: #E5E7EB;
+  border-color: #E5E7EB;
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:disabled {
-  background: #21262D;
+  background: var(--bg-subtle);
   border-color: var(--border-subtle);
   color: var(--text-muted);
+  box-shadow: none;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-secondary {
   background: var(--bg-surface);
   color: var(--text-primary);
-  border-color: var(--border-medium);
+  border-color: var(--border-subtle);
 }
 
 .btn-ghost {
@@ -172,70 +187,82 @@ html, body {
 }
 
 .btn-ghost:hover {
-  background: var(--bg-subtle);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
 }
 
 .btn-sm {
-  padding: 0.35rem 0.65rem;
+  padding: 0.4rem 0.85rem;
   font-size: 0.775rem;
 }
 
 .btn-emerald {
-  background: #1F6FEB;
-  border-color: #388BFD;
-  color: #FFFFFF;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #34D399;
 }
 
 .btn-emerald:hover {
-  background: #388BFD;
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
-/* Minimal Badges */
+/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-full);
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
   font-size: 0.725rem;
   font-weight: 600;
-  border: 1px solid var(--border-medium);
+  border: 1px solid var(--border-subtle);
   background: var(--bg-subtle);
   color: var(--text-secondary);
 }
 
 .badge-indigo {
-  background: rgba(88, 166, 255, 0.1);
-  color: var(--accent-blue);
-  border-color: rgba(88, 166, 255, 0.3);
+  background: rgba(99, 102, 241, 0.1);
+  color: #818CF8;
+  border-color: rgba(99, 102, 241, 0.25);
 }
 
 .badge-emerald {
-  background: rgba(46, 160, 67, 0.15);
-  color: #3FB950;
-  border-color: rgba(46, 160, 67, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: #34D399;
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
 .badge-cyan {
-  background: rgba(163, 113, 247, 0.15);
-  color: #D2A8FF;
-  border-color: rgba(163, 113, 247, 0.3);
+  background: rgba(6, 182, 212, 0.1);
+  color: #22D3EE;
+  border-color: rgba(6, 182, 212, 0.25);
 }
 
-/* Clean Diff Highlighting */
+/* Keyboard Shortcut Badge */
+.kbd-shortcut {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+  color: var(--text-secondary);
+}
+
+/* Diff View */
 .diff-added {
-  background: rgba(46, 160, 67, 0.1);
-  border-left: 3px solid #3FB950;
-  padding: 0.5rem 0.75rem;
-  margin: 0.35rem 0;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid #FFFFFF;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .diff-tag {
-  font-size: 0.7rem;
+  font-size: 0.675rem;
   font-weight: 700;
-  color: #3FB950;
+  color: var(--text-primary);
   text-transform: uppercase;
   margin-right: 0.5rem;
   font-family: var(--font-mono);
@@ -243,25 +270,21 @@ html, body {
 
 /* Variable Chips */
 .var-chip {
-  background: rgba(88, 166, 255, 0.15);
-  color: #79C0FF;
-  border: 1px solid rgba(88, 166, 255, 0.3);
-  padding: 0.1rem 0.35rem;
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 0.08rem 0.35rem;
   border-radius: 4px;
   font-family: var(--font-mono);
   font-size: 0.8em;
 }
 
-/* Minimal Animations */
+/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 150ms ease-out forwards;
-}
-
-.animate-slide-right {
-  animation: fadeIn 150ms ease-out forwards;
+  animation: fadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

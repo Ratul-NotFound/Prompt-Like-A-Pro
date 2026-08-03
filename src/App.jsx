@@ -4,9 +4,8 @@ import { enhancePrompt } from './utils/enhancerEngine';
 import { enhancePromptWithGemini } from './utils/geminiApi';
 
 import Navbar from './components/Navbar';
-import CategoryDropdownHeader from './components/CategoryDropdownHeader';
 import COStarTuner from './components/COStarTuner';
-import PromptWorkbench from './components/PromptWorkbench';
+import SketchLayoutWorkbench from './components/SketchLayoutWorkbench';
 import Toast from './components/Toast';
 import VariableModal from './components/VariableModal';
 import SettingsModal from './components/SettingsModal';
@@ -58,7 +57,6 @@ export default function App() {
       let resultObj = null;
 
       if (apiKey && apiKey.trim()) {
-        // Live Gemini AI Mode
         const resultText = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey);
         resultObj = {
           enhancedText: resultText,
@@ -69,7 +67,6 @@ export default function App() {
         };
         showToast('Prompt enhanced using Gemini AI!', 'success');
       } else {
-        // Offline Heuristic Framework Mode
         resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
         showToast('Prompt enhanced with CO-STAR framework!', 'success');
       }
@@ -134,12 +131,6 @@ export default function App() {
 
   return (
     <div className="app-layout">
-      {/* Background Atmosphere */}
-      <div className="ambient-bg">
-        <div className="ambient-glow-1" />
-        <div className="ambient-glow-2" />
-      </div>
-
       {/* Navigation Header */}
       <Navbar
         hasApiKey={Boolean(apiKey)}
@@ -148,30 +139,25 @@ export default function App() {
         onToggleHistory={() => setShowHistory(true)}
       />
 
-      {/* Main Layout Flow */}
+      {/* Main Content Layout Flow */}
       <main className="main-content">
-        {/* 1. Top Section: Category Cards with Interactive Subcategory Dropdowns */}
-        <CategoryDropdownHeader
-          selectedDomain={selectedDomain}
-          onSelectDomain={(dom) => {
-            setSelectedDomain(dom);
-            setTunerSettings({});
-          }}
-        />
-
-        {/* CO-STAR Framework Fine-Tuner */}
+        {/* 1. Prompt Parameters Tuner placed above the Prompt Input Box */}
         <COStarTuner
           settings={tunerSettings}
           onChangeSettings={setTunerSettings}
           selectedDomain={selectedDomain}
         />
 
-        {/* 2. Middle & 3. Bottom Sections: Prompt Input & Enhanced Output View */}
-        <PromptWorkbench
+        {/* 2. Prompt Input & Output Flow */}
+        <SketchLayoutWorkbench
           rawInput={rawInput}
           onRawInputChange={setRawInput}
           enhancedResult={enhancedResult}
           selectedDomain={selectedDomain}
+          onSelectDomain={(dom) => {
+            setSelectedDomain(dom);
+            setTunerSettings({});
+          }}
           onEnhance={handleEnhance}
           isEnhancing={isEnhancing}
           hasApiKey={Boolean(apiKey)}
@@ -202,11 +188,11 @@ export default function App() {
             text-align: center;
             font-size: 0.8rem;
             color: var(--text-muted);
-            background: rgba(8, 11, 17, 0.6);
+            background: var(--bg-surface);
           }
 
           .footer-content {
-            max-width: 1440px;
+            max-width: 840px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;

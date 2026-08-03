@@ -6,7 +6,6 @@
 
 export function extractVariables(text) {
   if (!text) return [];
-  // Match {{var_name}} or [Variable Name] or <VARIABLE>
   const doubleCurlyRegex = /\{\{([^}]+)\}\}/g;
   const squareBracketRegex = /\[([A-Z0-9_\s-]+)\]/g;
   
@@ -19,7 +18,6 @@ export function extractVariables(text) {
 
   while ((match = squareBracketRegex.exec(text)) !== null) {
     const val = match[1].trim();
-    // Exclude common markdown tags like [x] or [1]
     if (val.length > 1 && !/^\d+$/.test(val) && val.toLowerCase() !== 'x') {
       vars.add(val);
     }
@@ -30,8 +28,66 @@ export function extractVariables(text) {
 
 export function estimateTokens(text) {
   if (!text) return 0;
-  // Approximate rule of thumb: ~4 characters per token in English
   return Math.ceil(text.length / 4);
+}
+
+export function evaluatePromptStrength(text) {
+  if (!text || !text.trim()) {
+    return { score: 0, level: 'Empty', feedback: 'Enter some text to evaluate.', checks: [] };
+  }
+
+  let score = 0;
+  const checks = [];
+
+  // Length Check
+  if (text.length > 150) {
+    score += 30;
+    checks.push('Detailed Context provided');
+  } else if (text.length > 50) {
+    score += 15;
+    checks.push('Basic context provided');
+  }
+
+  // Key verb checks
+  const verbs = ['build', 'create', 'write', 'explain', 'analyze', 'audit', 'summarize', 'refactor', 'design', 'generate'];
+  const hasVerb = verbs.some(v => text.toLowerCase().includes(v));
+  if (hasVerb) {
+    score += 20;
+    checks.push('Clear action verbs');
+  }
+
+  // Constraints/Examples check
+  const constraints = ['not', 'avoid', 'only', 'don\'t', 'except', 'format', 'markdown', 'json', 'table'];
+  const hasConstraint = constraints.some(c => text.toLowerCase().includes(c));
+  if (hasConstraint) {
+    score += 25;
+    checks.push('Constraints or Formats specified');
+  }
+
+  // Variable check
+  const hasVariables = text.includes('{{') || text.includes('[') || text.includes('<');
+  if (hasVariables) {
+    score += 25;
+    checks.push('Uses variable placeholders');
+  }
+
+  let level = 'Basic';
+  let feedback = 'Add context, format requirements, or role constraints to make it professional.';
+
+  if (score >= 75) {
+    level = 'Pro / Elite';
+    feedback = 'Excellent. Contains specific context, actions, constraints, or formats.';
+  } else if (score >= 40) {
+    level = 'Advanced';
+    feedback = 'Good start. Add specific negative constraints or persona details.';
+  }
+
+  return {
+    score,
+    level,
+    feedback,
+    checks
+  };
 }
 
 export function enhancePrompt(rawPrompt, domain, settings = {}) {
@@ -84,7 +140,7 @@ Your task is to fulfill the following core request:${contextText}
 ${domainConstraints.map(c => `- ${c}`).join('\n')}`;
   additions.push({ tag: 'Constraints', text: constraintSection });
 
-  // 6. Chain-of-Thought (CoT) Directive (Optional/Enabled by default)
+  // 6. Chain-of-Thought (CoT) Directive (Optional)
   let cotSection = '';
   if (settings.useCoT !== false) {
     cotSection = `\n\n### 🧠 REASONING PROCESS

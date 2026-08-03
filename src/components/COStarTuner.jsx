@@ -15,7 +15,7 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
     <div className="costar-tuner-container glass-card">
       <div className="tuner-header" onClick={() => setIsOpen(!isOpen)}>
         <div className="header-left">
-          <Sliders size={16} className="tuner-icon" />
+          <Sliders size={15} className="tuner-icon" />
           <div>
             <h3 className="tuner-title">Framework & Persona Parameters</h3>
             <p className="tuner-sub">Fine-tune role, background context, tone, and reasoning constraints.</p>
@@ -33,6 +33,7 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
       {isOpen && (
         <div className="tuner-body animate-fade-in">
           <div className="tuner-grid">
+            {/* Role */}
             <div className="input-group">
               <label className="input-label">Role & Persona</label>
               <input
@@ -44,6 +45,7 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
               />
             </div>
 
+            {/* Tone */}
             <div className="input-group">
               <label className="input-label">Tone & Style</label>
               <input
@@ -51,10 +53,11 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
                 className="tuner-input"
                 value={tone}
                 onChange={(e) => onChangeSettings({ ...settings, tone: e.target.value })}
-                placeholder="e.g. Concise, Production-Grade"
+                placeholder="e.g. Concise, Technical"
               />
             </div>
 
+            {/* Audience */}
             <div className="input-group">
               <label className="input-label">Target Audience</label>
               <input
@@ -66,6 +69,7 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
               />
             </div>
 
+            {/* Format */}
             <div className="input-group">
               <label className="input-label">Output Format</label>
               <input
@@ -78,33 +82,38 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
             </div>
           </div>
 
-          <div className="input-group full-width" style={{ marginTop: '0.75rem' }}>
-            <label className="input-label">Background Context</label>
+          {/* Context */}
+          <div className="input-group full-width" style={{ marginTop: '0.85rem' }}>
+            <label className="input-label">Context (Optional)</label>
             <textarea
               className="tuner-textarea"
               rows={2}
               value={context}
               onChange={(e) => onChangeSettings({ ...settings, context: e.target.value })}
-              placeholder="Add project background, tech stack constraints, or relevant prior state..."
+              placeholder="Specify database schemas, libraries, constraints, or prior state..."
             />
           </div>
 
+          {/* Chain-of-Thought */}
           <div className="cot-toggle-bar">
             <div className="cot-info">
-              <Brain size={16} className="cot-icon" />
+              <Brain size={15} className="cot-icon" />
               <div>
-                <span className="cot-title">Chain-of-Thought (CoT) Reasoning</span>
+                <span className="cot-title">Chain-of-Thought Reasoning</span>
                 <p className="cot-desc">Instructs model to reason step-by-step before producing code or final answers.</p>
               </div>
             </div>
 
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={useCoT}
-                onChange={(e) => onChangeSettings({ ...settings, useCoT: e.target.checked })}
-              />
-              <span className="slider round"></span>
+            <label className="switch-container">
+              <span className="switch-status">{useCoT ? 'Enabled' : 'Disabled'}</span>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={useCoT}
+                  onChange={(e) => onChangeSettings({ ...settings, useCoT: e.target.checked })}
+                />
+                <span className="slider round"></span>
+              </label>
             </label>
           </div>
         </div>
@@ -113,13 +122,14 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
       <style>{`
         .costar-tuner-container {
           margin-bottom: 1.5rem;
+          width: 100%;
         }
 
         .tuner-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem 1rem;
+          padding: 0.85rem 1.25rem;
           cursor: pointer;
           user-select: none;
         }
@@ -131,7 +141,7 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
         .header-left {
           display: flex;
           align-items: center;
-          gap: 0.6rem;
+          gap: 0.65rem;
         }
 
         .tuner-icon {
@@ -152,19 +162,25 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
         .header-right {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.65rem;
         }
 
         .tuner-body {
-          padding: 0.85rem 1rem 1rem 1rem;
-          border-top: 1px solid var(--border-medium);
-          background: var(--bg-input);
+          padding: 1.25rem;
+          border-top: 1px solid var(--border-subtle);
+          background: var(--bg-subtle);
         }
 
         .tuner-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 0.75rem;
+          gap: 0.85rem;
+        }
+
+        @media (max-width: 640px) {
+          .tuner-grid {
+            grid-template-columns: 1fr;
+          }
         }
 
         .input-group {
@@ -174,28 +190,28 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
         }
 
         .input-label {
-          font-size: 0.725rem;
+          font-size: 0.7rem;
           font-weight: 600;
           color: var(--text-secondary);
           text-transform: uppercase;
-          letter-spacing: 0.03em;
+          letter-spacing: 0.04em;
         }
 
         .tuner-input, .tuner-textarea {
           width: 100%;
-          background: var(--bg-surface);
-          border: 1px solid var(--border-medium);
+          background: var(--bg-input);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-sm);
-          padding: 0.45rem 0.65rem;
+          padding: 0.5rem 0.75rem;
           color: var(--text-primary);
           font-size: 0.825rem;
           font-family: var(--font-ui);
           outline: none;
-          transition: border-color var(--transition-fast);
+          transition: border-color var(--transition-normal);
         }
 
         .tuner-input:focus, .tuner-textarea:focus {
-          border-color: var(--border-active);
+          border-color: var(--border-medium);
         }
 
         .cot-toggle-bar {
@@ -205,37 +221,50 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
           margin-top: 0.85rem;
           padding: 0.65rem 0.85rem;
           background: var(--bg-surface);
-          border: 1px solid var(--border-medium);
-          border-radius: var(--radius-sm);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-md);
         }
 
         .cot-info {
           display: flex;
           align-items: center;
-          gap: 0.6rem;
+          gap: 0.5rem;
         }
 
         .cot-icon {
-          color: var(--accent-blue);
+          color: var(--text-secondary);
         }
 
         .cot-title {
-          font-size: 0.825rem;
+          font-size: 0.8rem;
           font-weight: 700;
           color: var(--text-primary);
         }
 
         .cot-desc {
-          font-size: 0.725rem;
+          font-size: 0.7rem;
           color: var(--text-muted);
+          line-height: 1.35;
         }
 
-        /* Minimal Switch */
+        .switch-container {
+          display: flex;
+          align-items: center;
+          gap: 0.65rem;
+        }
+
+        .switch-status {
+          font-size: 0.725rem;
+          color: var(--text-secondary);
+          font-weight: 600;
+        }
+
+        /* Switch */
         .switch {
           position: relative;
           display: inline-block;
-          width: 38px;
-          height: 20px;
+          width: 32px;
+          height: 18px;
         }
 
         .switch input {
@@ -248,17 +277,17 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
           position: absolute;
           cursor: pointer;
           top: 0; left: 0; right: 0; bottom: 0;
-          background-color: var(--bg-subtle);
-          border: 1px solid var(--border-medium);
+          background-color: var(--bg-input);
+          border: 1px solid var(--border-subtle);
           transition: .2s;
-          border-radius: 20px;
+          border-radius: 18px;
         }
 
         .slider:before {
           position: absolute;
           content: "";
-          height: 14px;
-          width: 14px;
+          height: 12px;
+          width: 12px;
           left: 2px;
           bottom: 2px;
           background-color: var(--text-secondary);
@@ -267,19 +296,13 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
         }
 
         input:checked + .slider {
-          background-color: var(--accent-primary);
-          border-color: var(--accent-primary);
+          background-color: #FFFFFF;
+          border-color: #FFFFFF;
         }
 
         input:checked + .slider:before {
-          transform: translateX(18px);
-          background-color: #FFFFFF;
-        }
-
-        @media (max-width: 768px) {
-          .tuner-grid {
-            grid-template-columns: 1fr;
-          }
+          transform: translateX(14px);
+          background-color: #000;
         }
       `}</style>
     </div>

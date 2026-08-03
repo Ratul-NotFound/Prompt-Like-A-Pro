@@ -5,7 +5,7 @@ export const DOMAINS = [
     category: 'Coding',
     icon: 'Layout',
     badge: 'Coding',
-    color: '#6366F1',
+    color: '#FAFAFA',
     description: 'Build modern, high-aesthetic UI components with responsive layouts, CSS glassmorphism, and micro-interactions.',
     defaultRole: 'Principal Frontend Engineer & UI/UX Design System Architect',
     frameworkDefaults: {
@@ -24,7 +24,7 @@ export const DOMAINS = [
     category: 'Coding',
     icon: 'Server',
     badge: 'Coding',
-    color: '#8B5CF6',
+    color: '#FAFAFA',
     description: 'Design robust RESTful/GraphQL APIs, database schemas, authentication layers, and scalable services.',
     defaultRole: 'Staff Backend Architect & Distributed Systems Engineer',
     frameworkDefaults: {
@@ -43,7 +43,7 @@ export const DOMAINS = [
     category: 'Coding',
     icon: 'ShieldCheck',
     badge: 'Security',
-    color: '#F43F5E',
+    color: '#FAFAFA',
     description: 'Inspect code for OWASP Top 10 vulnerabilities, XSS, SQL Injection, broken access control, and secrets leakage.',
     defaultRole: 'Lead Application Security Engineer & Cybersecurity Auditor',
     frameworkDefaults: {
@@ -62,7 +62,7 @@ export const DOMAINS = [
     category: 'Coding',
     icon: 'Bug',
     badge: 'Coding',
-    color: '#10B981',
+    color: '#FAFAFA',
     description: 'Diagnose runtime errors, analyze stack traces, fix memory leaks, and refactor messy code into clean patterns.',
     defaultRole: 'Senior Staff Engineer & Code Quality Specialist',
     frameworkDefaults: {
@@ -81,7 +81,7 @@ export const DOMAINS = [
     category: 'Study',
     icon: 'Brain',
     badge: 'Study',
-    color: '#06B6D4',
+    color: '#FAFAFA',
     description: 'Break down complex technical or academic topics using plain language, real-world analogies, and mental models.',
     defaultRole: 'World-Class Educator & Feynman Learning Method Expert',
     frameworkDefaults: {
@@ -100,7 +100,7 @@ export const DOMAINS = [
     category: 'Study',
     icon: 'BookOpen',
     badge: 'Study',
-    color: '#F59E0B',
+    color: '#FAFAFA',
     description: 'Transform lectures, textbook chapters, or articles into structured Cornell study notes and active recall questions.',
     defaultRole: 'Academic Strategy Consultant & Learning Scientist',
     frameworkDefaults: {
@@ -119,7 +119,7 @@ export const DOMAINS = [
     category: 'Study',
     icon: 'FileText',
     badge: 'Research',
-    color: '#EC4899',
+    color: '#FAFAFA',
     description: 'Summarize scientific research papers, analyze methodologies, spot study limitations, and extract key findings.',
     defaultRole: 'Principal Academic Researcher & Peer Reviewer',
     frameworkDefaults: {
@@ -138,7 +138,7 @@ export const DOMAINS = [
     category: 'Writing',
     icon: 'PenTool',
     badge: 'Writing',
-    color: '#3B82F6',
+    color: '#FAFAFA',
     description: 'Write engaging, SEO-optimized blog posts with high-converting hooks, clear headers, and strong search intent matching.',
     defaultRole: 'Senior Content Strategist & Growth Copywriter',
     frameworkDefaults: {
@@ -157,7 +157,7 @@ export const DOMAINS = [
     category: 'Writing',
     icon: 'MessageSquare',
     badge: 'Writing',
-    color: '#A855F7',
+    color: '#FAFAFA',
     description: 'Generate high-performing LinkedIn posts, X/Twitter viral threads, and compelling cold outreach emails.',
     defaultRole: 'Viral Content Director & B2B Outreach Specialist',
     frameworkDefaults: {
@@ -176,7 +176,7 @@ export const DOMAINS = [
     category: 'Visuals',
     icon: 'Sparkles',
     badge: 'Visuals',
-    color: '#14B8A6',
+    color: '#FAFAFA',
     description: 'Craft hyper-detailed prompts for Midjourney, DALL-E 3, and Flux with lighting, lens specs, camera angles, and style tags.',
     defaultRole: 'Expert AI Visual Artist & Cinematic Director',
     frameworkDefaults: {
@@ -195,7 +195,7 @@ export const DOMAINS = [
     category: 'AI Systems',
     icon: 'Cpu',
     badge: 'AI Systems',
-    color: '#6366F1',
+    color: '#FAFAFA',
     description: 'Build production-ready System Instructions for Custom GPTs, AI Agents, and LLM applications with guardrails.',
     defaultRole: 'Senior AI Engineer & System Prompt Architect',
     frameworkDefaults: {
