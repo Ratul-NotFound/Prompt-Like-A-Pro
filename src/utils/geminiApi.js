@@ -43,10 +43,9 @@ export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model =
 }
 
 // Direct client-side Google API call with automated cascading model fallback
-async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, modelIndex = 0) {
-  // Guaranteed fallback scan starting from index 0 if index is out of bounds
-  const activeIndex = modelIndex >= 0 && modelIndex < GEMINI_MODEL_FALLBACKS.length ? modelIndex : 0;
-  const activeModel = GEMINI_MODEL_FALLBACKS[activeIndex];
+async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel) {
+  const startIndex = Math.max(0, GEMINI_MODEL_FALLBACKS.indexOf(targetModel));
+  const modelsToTry = GEMINI_MODEL_FALLBACKS.slice(startIndex);
 
   const systemInstruction = `You are a Master AI Prompt Engineer and AI Meta-Prompting Specialist.
 Your task is to take a raw, unstructured user prompt and transform it into a hyper-optimized, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
@@ -67,56 +66,61 @@ RAW USER PROMPT TO ENHANCE:
 
 Please generate the enhanced, professionally engineered prompt now:`;
 
-  const url = `https://generativelanguage.googleapis.com/v1/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
+  let lastError = null;
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: systemInstruction + '\n\n' + userMessage }]
+  for (const activeModel of modelsToTry) {
+    const url = `https://generativelanguage.googleapis.com/v1/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: systemInstruction + '\n\n' + userMessage }]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 2000
           }
-        ],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 2000
-        }
-      })
-    });
+        })
+      });
 
-    // If active model is rejected (404/429/400), cascade to next fallback model
-    if ((response.status === 404 || response.status === 429 || response.status === 400) && activeIndex < GEMINI_MODEL_FALLBACKS.length - 1) {
-      console.warn(`Model ${activeModel} failed (HTTP ${response.status}). Cascading to fallback model index ${activeIndex + 1}...`);
-      return await queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, activeIndex + 1);
+      if (response.status === 404 || response.status === 429 || response.status === 400) {
+        console.warn(`Model ${activeModel} failed (HTTP ${response.status}). Cascading to next model...`);
+        lastError = new Error(`HTTP ${response.status}`);
+        continue;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Gemini API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!resultText) {
+        throw new Error('Empty response.');
+      }
+
+      return {
+        text: resultText.trim(),
+        fallbackUsed: activeModel !== targetModel,
+        actualModelUsed: activeModel,
+        providerUsed: 'Gemini AI'
+      };
+    } catch (err) {
+      console.warn(`Catch block triggered for ${activeModel}: ${err.message}. Cascading...`);
+      lastError = err;
+      continue;
     }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `Gemini API Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!resultText) {
-      throw new Error('Empty response.');
-    }
-
-    return {
-      text: resultText.trim(),
-      fallbackUsed: activeModel !== targetModel,
-      actualModelUsed: activeModel
-    };
-  } catch (err) {
-    if (activeIndex < GEMINI_MODEL_FALLBACKS.length - 1) {
-      console.warn(`Catch block triggered for ${activeModel}. Cascading to next model...`);
-      return await queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, activeIndex + 1);
-    }
-    throw err;
   }
+
+  throw lastError || new Error('All fallback models exhausted.');
 }
