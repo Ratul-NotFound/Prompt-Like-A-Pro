@@ -46,8 +46,7 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
               >
                 <option value="gemini-2.5-pro">Gemini 2.5 Pro (Recommended - Deep Intent Analysis & Reasoning)</option>
                 <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast, Multimodal)</option>
-                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy Pro)</option>
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy Flash)</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Balanced Speed & Precision)</option>
               </select>
             </div>
             <p className="model-desc">

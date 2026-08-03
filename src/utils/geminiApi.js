@@ -7,9 +7,7 @@
 const GEMINI_MODEL_FALLBACKS = [
   'gemini-2.5-pro',
   'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-pro',
-  'gemini-1.5-flash'
+  'gemini-2.0-flash'
 ];
 
 export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-2.5-pro') {
