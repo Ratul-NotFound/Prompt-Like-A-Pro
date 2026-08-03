@@ -123,14 +123,8 @@ export function enhancePrompt(rawPrompt, domain, settings = {}) {
   const domainConstraints = getDomainConstraints(domain.id);
   const constraintSection = `**Constraints:**
 ${domainConstraints.map(c => `- ${c}`).join('\n')}`;
-  additions.push({ tag: 'Constraints', text: constraintSection });
-
   // Combine into Dense Master Prompt
-  const enhancedText = `${objectiveSection}
-
-${styleSection}
-
-${constraintSection}`;ntSection}${cotSection}`;
+  const enhancedText = `${objectiveSection}\n\n${styleSection}\n\n${constraintSection}`;
 
   const variables = extractVariables(enhancedText);
 
