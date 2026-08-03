@@ -1,14 +1,43 @@
 /**
  * Prompt Like A Pro — Optional Live Gemini Meta-Prompt API Client
- * Uses Google Gemini REST API to perform live AI-to-AI prompt engineering.
- * Features automated Model Fallback (Pro -> Flash) for quota limits.
+ * Uses Google Gemini REST API or secure Serverless Backend Proxy (/api/enhance)
+ * with built-in Key Rotation Pool support.
  */
 
-export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-1.5-pro', isFallbackRun = false) {
-  if (!apiKey || !apiKey.trim()) {
-    throw new Error('Gemini API Key is missing. Please provide a valid key in Settings.');
+export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-1.5-pro') {
+  // If an API key is provided directly in the browser (Settings override), call Google directly
+  if (apiKey && apiKey.trim()) {
+    return await queryGoogleDirectly(rawPrompt, domain, apiKey, model);
   }
 
+  // Otherwise, route through the secure Vercel Serverless Proxy endpoint (keeps keys hidden)
+  try {
+    const response = await fetch('/api/enhance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        rawPrompt,
+        domain,
+        model
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `Proxy Server Error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('Backend Proxy Request Failed:', err);
+    throw err;
+  }
+}
+
+// Direct client-side Google API call with model fallback (Pro -> Flash)
+async function queryGoogleDirectly(rawPrompt, domain, apiKey, model, isFallbackRun = false) {
   const systemInstruction = `You are a Master AI Prompt Engineer and AI Meta-Prompting Specialist.
 Your task is to take a raw, unstructured user prompt and transform it into a hyper-optimized, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
 
@@ -40,9 +69,7 @@ Please generate the enhanced, professionally engineered prompt now:`;
         contents: [
           {
             role: 'user',
-            parts: [
-              { text: systemInstruction + '\n\n' + userMessage }
-            ]
+            parts: [{ text: systemInstruction + '\n\n' + userMessage }]
           }
         ],
         generationConfig: {
@@ -52,22 +79,22 @@ Please generate the enhanced, professionally engineered prompt now:`;
       })
     });
 
-    // Check for HTTP 429 (Resource Exhausted) to run automated fallback
+    // Check for HTTP 429 to run fallback
     if (response.status === 429 && model === 'gemini-1.5-pro' && !isFallbackRun) {
-      console.warn('Gemini 1.5 Pro rate limit exceeded. Attempting fallback to Gemini 1.5 Flash...');
-      return await enhancePromptWithGemini(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
+      console.warn('Gemini 1.5 Pro limit reached. Trying Gemini 1.5 Flash...');
+      return await queryGoogleDirectly(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
     }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `Gemini API HTTP Error: ${response.status}`);
+      throw new Error(errorData.error?.message || `Gemini API Error: ${response.status}`);
     }
 
     const data = await response.json();
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!resultText) {
-      throw new Error('Received an empty response from Gemini API.');
+      throw new Error('Empty response.');
     }
 
     return {
@@ -76,14 +103,8 @@ Please generate the enhanced, professionally engineered prompt now:`;
       actualModelUsed: model
     };
   } catch (err) {
-    // If Pro failed and we haven't tried Flash yet, attempt Flash fallback on standard failures too
     if (model === 'gemini-1.5-pro' && !isFallbackRun) {
-      console.warn('Gemini 1.5 Pro request failed. Falling back to Gemini 1.5 Flash...', err);
-      try {
-        return await enhancePromptWithGemini(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
-      } catch (fallbackErr) {
-        throw fallbackErr;
-      }
+      return await queryGoogleDirectly(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
     }
     throw err;
   }

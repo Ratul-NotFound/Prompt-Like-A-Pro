@@ -65,35 +65,30 @@ export default function App() {
     try {
       let resultObj = null;
 
-      if (apiKey && apiKey.trim()) {
-        try {
-          const apiResponse = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel);
-          resultObj = {
-            enhancedText: apiResponse.text,
-            additions: [
-              { 
-                tag: `${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}${apiResponse.fallbackUsed ? ' (Fallback)' : ''} Meta-Prompt Engine`, 
-                text: apiResponse.text 
-              }
-            ],
-            variables: [],
-            tokenCount: Math.ceil(apiResponse.text.length / 4),
-            rawTokenCount: Math.ceil(rawInput.length / 4)
-          };
+      try {
+        const apiResponse = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel);
+        resultObj = {
+          enhancedText: apiResponse.text,
+          additions: [
+            { 
+              tag: `${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}${apiResponse.fallbackUsed ? ' (Fallback)' : ''} Meta-Prompt Engine`, 
+              text: apiResponse.text 
+            }
+          ],
+          variables: [],
+          tokenCount: Math.ceil(apiResponse.text.length / 4),
+          rawTokenCount: Math.ceil(rawInput.length / 4)
+        };
 
-          if (apiResponse.fallbackUsed) {
-            showToast('Gemini Pro limit reached. Automatically fell back to Gemini Flash!', 'warning');
-          } else {
-            showToast(`Enhanced using ${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}!`, 'success');
-          }
-        } catch (apiErr) {
-          console.warn('Gemini Live API failed. Falling back to local heuristics:', apiErr);
-          resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
-          showToast('Live API failed. Automatically fell back to Local Heuristic Engine.', 'warning');
+        if (apiResponse.fallbackUsed) {
+          showToast('Gemini Pro limit reached. Automatically fell back to Gemini Flash!', 'warning');
+        } else {
+          showToast(`Enhanced using ${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}!`, 'success');
         }
-      } else {
+      } catch (apiErr) {
+        console.warn('Gemini Live API failed. Falling back to local heuristics:', apiErr);
         resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
-        showToast('Prompt enhanced with CO-STAR framework!', 'success');
+        showToast('Live API failed. Automatically fell back to Local Heuristic Engine.', 'warning');
       }
 
       setEnhancedResult(resultObj);
