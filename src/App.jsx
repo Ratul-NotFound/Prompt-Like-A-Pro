@@ -20,7 +20,11 @@ export default function App() {
   const [isEnhancing, setIsEnhancing] = useState(false);
 
   // LocalStorage Persistence
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('prompt_pro_gemini_key') || '');
+  const [apiKey, setApiKey] = useState(() => {
+    const envKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    if (envKey) return envKey;
+    return localStorage.getItem('prompt_pro_gemini_key') || '';
+  });
   const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('prompt_pro_gemini_model') || 'gemini-1.5-pro');
   const [history, setHistory] = useState(() => {
     try {

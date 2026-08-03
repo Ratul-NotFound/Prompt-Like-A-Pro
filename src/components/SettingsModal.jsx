@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { Key, X, Check, ExternalLink, ShieldCheck, Cpu } from 'lucide-react';
+import { Key, X, Check, ExternalLink, ShieldCheck } from 'lucide-react';
 
 export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onSaveModel, onClose }) {
   const [inputKey, setInputKey] = useState(apiKey || '');
   const [model, setModel] = useState(selectedModel || 'gemini-1.5-pro');
 
+  const isEnvKeyDefined = Boolean(import.meta.env.VITE_GEMINI_API_KEY);
+
   const handleSave = (e) => {
     e.preventDefault();
-    onSaveApiKey(inputKey.trim());
+    if (!isEnvKeyDefined) {
+      onSaveApiKey(inputKey.trim());
+    }
     onSaveModel(model);
     onClose();
   };
@@ -31,7 +35,7 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
             <p>Your API key is stored <strong>locally in your browser</strong> (localStorage). It is never sent to any intermediary server.</p>
           </div>
 
-          {/* Model Selector (New addition for lifetime free premium models) */}
+          {/* Model Selector */}
           <div className="input-group" style={{ marginTop: '0.5rem' }}>
             <label className="input-label">Select Model Engine</label>
             <div className="select-wrapper">
@@ -49,31 +53,43 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
             </p>
           </div>
 
+          {/* Environment Variable Check / Input */}
           <div className="input-group" style={{ marginTop: '0.5rem' }}>
-            <label className="input-label">Google Gemini API Key (Optional)</label>
-            <input
-              type="password"
-              className="tuner-input"
-              placeholder="AIzaSy..."
-              value={inputKey}
-              onChange={(e) => setInputKey(e.target.value)}
-            />
+            <label className="input-label">Google Gemini API Key</label>
+            {isEnvKeyDefined ? (
+              <div className="env-detected-block">
+                <div className="status-indicator" style={{ background: 'rgba(16, 185, 129, 0.05)', marginLeft: 0 }}>
+                  <span className="status-dot active" />
+                  <span className="status-text" style={{ color: '#10B981', fontWeight: 600 }}>Active via .env file</span>
+                </div>
+                <p className="env-help">To update or remove this key, modify the <code>VITE_GEMINI_API_KEY</code> variable in your local <code>.env</code> file.</p>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="password"
+                  className="tuner-input"
+                  placeholder="AIzaSy..."
+                  value={inputKey}
+                  onChange={(e) => setInputKey(e.target.value)}
+                />
+                <p className="key-help">
+                  Get a free API Key from{' '}
+                  <a 
+                    href="https://aistudio.google.com/app/apikey" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="link"
+                  >
+                    Google AI Studio <ExternalLink size={12} />
+                  </a>
+                </p>
+              </>
+            )}
           </div>
 
-          <p className="key-help">
-            Get a free API Key from{' '}
-            <a 
-              href="https://aistudio.google.com/app/apikey" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="link"
-            >
-              Google AI Studio <ExternalLink size={12} />
-            </a>
-          </p>
-
           <div className="modal-actions" style={{ marginTop: '1.25rem' }}>
-            {apiKey && (
+            {!isEnvKeyDefined && apiKey && (
               <button 
                 type="button" 
                 className="btn btn-ghost btn-sm text-rose"
@@ -125,15 +141,27 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
           width: 100%;
         }
 
-        .tuner-input select {
-          appearance: none;
-        }
-
         .model-desc {
           font-size: 0.725rem;
           color: var(--text-muted);
           line-height: 1.35;
           margin-top: 0.25rem;
+        }
+
+        .env-detected-block {
+          background: var(--bg-subtle);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-sm);
+          padding: 0.75rem 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+
+        .env-help {
+          font-size: 0.725rem;
+          color: var(--text-muted);
+          line-height: 1.4;
         }
 
         .key-help {
