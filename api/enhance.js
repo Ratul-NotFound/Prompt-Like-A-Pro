@@ -2,15 +2,22 @@
  * Prompt Like A Pro — Secure Backend Proxy & Key Rotation Serverless Function
  * Deploys on Vercel under `/api/enhance`
  * Features Multi-Provider Fallback Pooling (Gemini -> Groq -> OpenRouter -> HuggingFace)
- * Uses the stable v1 API endpoint version for Google Gemini models.
+ * Uses the stable v1 API with cascading model fallbacks (Gemini 2.5 -> 1.5).
  */
+
+const GEMINI_MODEL_FALLBACKS = [
+  'gemini-2.5-pro',
+  'gemini-2.5-flash',
+  'gemini-1.5-pro',
+  'gemini-1.5-flash'
+];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
-  const { rawPrompt, domain, model = 'gemini-1.5-pro' } = req.body;
+  const { rawPrompt, domain, model = 'gemini-2.5-pro' } = req.body;
 
   if (!rawPrompt || !rawPrompt.trim()) {
     return res.status(400).json({ error: 'Missing prompt content.' });
@@ -159,14 +166,13 @@ function parseKeys(envValue) {
 }
 
 async function queryGemini(rawPrompt, domain, apiKey, targetModel, systemInstruction, userMessage) {
-  const modelsToTry = targetModel === 'gemini-1.5-pro' 
-    ? ['gemini-1.5-pro', 'gemini-1.5-flash'] 
-    : ['gemini-1.5-flash'];
+  const startIndex = GEMINI_MODEL_FALLBACKS.indexOf(targetModel);
+  const activeStartIndex = startIndex !== -1 ? startIndex : 0;
+  const modelsToTry = GEMINI_MODEL_FALLBACKS.slice(activeStartIndex);
 
   let lastError = null;
 
   for (const model of modelsToTry) {
-    // Using stable v1 API version
     const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
 
     try {

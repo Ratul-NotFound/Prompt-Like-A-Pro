@@ -25,7 +25,7 @@ export default function App() {
     if (envKey) return envKey;
     return localStorage.getItem('prompt_pro_gemini_key') || '';
   });
-  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('prompt_pro_gemini_model') || 'gemini-1.5-pro');
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('prompt_pro_gemini_model') || 'gemini-2.5-pro');
   const [history, setHistory] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('prompt_pro_history')) || [];

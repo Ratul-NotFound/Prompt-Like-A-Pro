@@ -1,10 +1,17 @@
 /**
  * Prompt Like A Pro — Optional Live Gemini Meta-Prompt API Client
  * Uses Google Gemini REST API or secure Serverless Backend Proxy (/api/enhance)
- * with built-in Key Rotation Pool support.
+ * with built-in Key Rotation Pool and Model Version Fallback.
  */
 
-export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-1.5-pro') {
+const GEMINI_MODEL_FALLBACKS = [
+  'gemini-2.5-pro',
+  'gemini-2.5-flash',
+  'gemini-1.5-pro',
+  'gemini-1.5-flash'
+];
+
+export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-2.5-pro') {
   // If an API key is provided directly in the browser (Settings override), call Google directly
   if (apiKey && apiKey.trim()) {
     return await queryGoogleDirectly(rawPrompt, domain, apiKey, model);
@@ -36,8 +43,12 @@ export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model =
   }
 }
 
-// Direct client-side Google API call with model fallback (Pro -> Flash)
-async function queryGoogleDirectly(rawPrompt, domain, apiKey, model, isFallbackRun = false) {
+// Direct client-side Google API call with automated cascading model fallback
+async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, modelIndex = -1) {
+  const currentModelIndex = modelIndex !== -1 ? modelIndex : GEMINI_MODEL_FALLBACKS.indexOf(targetModel);
+  const activeIndex = currentModelIndex !== -1 ? currentModelIndex : 0;
+  const activeModel = GEMINI_MODEL_FALLBACKS[activeIndex] || 'gemini-2.5-flash';
+
   const systemInstruction = `You are a Master AI Prompt Engineer and AI Meta-Prompting Specialist.
 Your task is to take a raw, unstructured user prompt and transform it into a hyper-optimized, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
 
@@ -57,7 +68,7 @@ RAW USER PROMPT TO ENHANCE:
 
 Please generate the enhanced, professionally engineered prompt now:`;
 
-  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey.trim()}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
 
   try {
     const response = await fetch(url, {
@@ -79,10 +90,10 @@ Please generate the enhanced, professionally engineered prompt now:`;
       })
     });
 
-    // Check for HTTP 429 to run fallback
-    if (response.status === 429 && model === 'gemini-1.5-pro' && !isFallbackRun) {
-      console.warn('Gemini 1.5 Pro limit reached. Trying Gemini 1.5 Flash...');
-      return await queryGoogleDirectly(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
+    // Check for HTTP 404/429 to cascade down the model list
+    if ((response.status === 404 || response.status === 429 || response.status === 400) && activeIndex < GEMINI_MODEL_FALLBACKS.length - 1) {
+      console.warn(`Model ${activeModel} failed (HTTP ${response.status}). Trying next fallback model...`);
+      return await queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, activeIndex + 1);
     }
 
     if (!response.ok) {
@@ -99,12 +110,13 @@ Please generate the enhanced, professionally engineered prompt now:`;
 
     return {
       text: resultText.trim(),
-      fallbackUsed: isFallbackRun,
-      actualModelUsed: model
+      fallbackUsed: activeModel !== targetModel,
+      actualModelUsed: activeModel
     };
   } catch (err) {
-    if (model === 'gemini-1.5-pro' && !isFallbackRun) {
-      return await queryGoogleDirectly(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
+    if (activeIndex < GEMINI_MODEL_FALLBACKS.length - 1) {
+      console.warn(`Catch block triggered for ${activeModel}. Falling back to next model...`);
+      return await queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, activeIndex + 1);
     }
     throw err;
   }

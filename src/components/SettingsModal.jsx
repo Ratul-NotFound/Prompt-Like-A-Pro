@@ -3,7 +3,7 @@ import { Key, X, Check, ExternalLink, ShieldCheck } from 'lucide-react';
 
 export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onSaveModel, onClose }) {
   const [inputKey, setInputKey] = useState(apiKey || '');
-  const [model, setModel] = useState(selectedModel || 'gemini-1.5-pro');
+  const [model, setModel] = useState(selectedModel || 'gemini-2.5-pro');
 
   const isEnvKeyDefined = Boolean(import.meta.env.VITE_GEMINI_API_KEY);
 
@@ -44,12 +44,14 @@ export default function SettingsModal({ apiKey, onSaveApiKey, selectedModel, onS
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
               >
-                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Recommended - Deep Intent Analysis & Reasoning)</option>
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Lightweight, Faster Responses)</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro (Recommended - Deep Intent Analysis & Reasoning)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast, Multimodal)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy Pro)</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy Flash)</option>
               </select>
             </div>
             <p className="model-desc">
-              <strong>Gemini 1.5 Pro</strong> features advanced cognitive reasoning and excels at understanding complex, nuanced instructions to craft elite prompts. Both models are available under Google AI Studio's free tier.
+              <strong>Gemini 2.5 Pro</strong> features advanced cognitive reasoning and excels at understanding complex, nuanced instructions to craft elite prompts. Both models are available under Google AI Studio's free tier.
             </p>
           </div>
 
