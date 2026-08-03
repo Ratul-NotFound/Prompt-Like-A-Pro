@@ -57,7 +57,7 @@ RAW USER PROMPT TO ENHANCE:
 
 Please generate the enhanced, professionally engineered prompt now:`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey.trim()}`;
 
   try {
     const response = await fetch(url, {

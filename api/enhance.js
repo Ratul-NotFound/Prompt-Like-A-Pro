@@ -2,6 +2,7 @@
  * Prompt Like A Pro — Secure Backend Proxy & Key Rotation Serverless Function
  * Deploys on Vercel under `/api/enhance`
  * Features Multi-Provider Fallback Pooling (Gemini -> Groq -> OpenRouter -> HuggingFace)
+ * Uses the stable v1 API endpoint version for Google Gemini models.
  */
 
 export default async function handler(req, res) {
@@ -165,7 +166,8 @@ async function queryGemini(rawPrompt, domain, apiKey, targetModel, systemInstruc
   let lastError = null;
 
   for (const model of modelsToTry) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    // Using stable v1 API version
+    const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
 
     try {
       const response = await fetch(url, {
@@ -280,7 +282,6 @@ async function queryHuggingFace(apiKey, model, systemInstruction, userMessage) {
   }
 
   const data = await response.json();
-  // HuggingFace returns an array of result objects
   const text = data[0]?.generated_text || data.generated_text;
 
   if (!text) {
