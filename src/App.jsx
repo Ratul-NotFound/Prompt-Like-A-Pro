@@ -66,15 +66,31 @@ export default function App() {
       let resultObj = null;
 
       if (apiKey && apiKey.trim()) {
-        const resultText = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel);
-        resultObj = {
-          enhancedText: resultText,
-          additions: [{ tag: `${selectedModel === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'} Meta-Prompt Engine`, text: resultText }],
-          variables: [],
-          tokenCount: Math.ceil(resultText.length / 4),
-          rawTokenCount: Math.ceil(rawInput.length / 4)
-        };
-        showToast(`Enhanced using ${selectedModel === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro (Deep Logic)' : 'Gemini 1.5 Flash'}!`, 'success');
+        try {
+          const apiResponse = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel);
+          resultObj = {
+            enhancedText: apiResponse.text,
+            additions: [
+              { 
+                tag: `${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}${apiResponse.fallbackUsed ? ' (Fallback)' : ''} Meta-Prompt Engine`, 
+                text: apiResponse.text 
+              }
+            ],
+            variables: [],
+            tokenCount: Math.ceil(apiResponse.text.length / 4),
+            rawTokenCount: Math.ceil(rawInput.length / 4)
+          };
+
+          if (apiResponse.fallbackUsed) {
+            showToast('Gemini Pro limit reached. Automatically fell back to Gemini Flash!', 'warning');
+          } else {
+            showToast(`Enhanced using ${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}!`, 'success');
+          }
+        } catch (apiErr) {
+          console.warn('Gemini Live API failed. Falling back to local heuristics:', apiErr);
+          resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
+          showToast('Live API failed. Automatically fell back to Local Heuristic Engine.', 'warning');
+        }
       } else {
         resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
         showToast('Prompt enhanced with CO-STAR framework!', 'success');

@@ -1,10 +1,10 @@
 /**
  * Prompt Like A Pro — Optional Live Gemini Meta-Prompt API Client
  * Uses Google Gemini REST API to perform live AI-to-AI prompt engineering.
- * Defaults to gemini-1.5-pro for deep reasoning and intent analysis.
+ * Features automated Model Fallback (Pro -> Flash) for quota limits.
  */
 
-export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-1.5-pro') {
+export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-1.5-pro', isFallbackRun = false) {
   if (!apiKey || !apiKey.trim()) {
     throw new Error('Gemini API Key is missing. Please provide a valid key in Settings.');
   }
@@ -52,6 +52,12 @@ Please generate the enhanced, professionally engineered prompt now:`;
       })
     });
 
+    // Check for HTTP 429 (Resource Exhausted) to run automated fallback
+    if (response.status === 429 && model === 'gemini-1.5-pro' && !isFallbackRun) {
+      console.warn('Gemini 1.5 Pro rate limit exceeded. Attempting fallback to Gemini 1.5 Flash...');
+      return await enhancePromptWithGemini(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
+    }
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error?.message || `Gemini API HTTP Error: ${response.status}`);
@@ -64,9 +70,21 @@ Please generate the enhanced, professionally engineered prompt now:`;
       throw new Error('Received an empty response from Gemini API.');
     }
 
-    return resultText.trim();
+    return {
+      text: resultText.trim(),
+      fallbackUsed: isFallbackRun,
+      actualModelUsed: model
+    };
   } catch (err) {
-    console.error('Gemini API Enhancement Error:', err);
+    // If Pro failed and we haven't tried Flash yet, attempt Flash fallback on standard failures too
+    if (model === 'gemini-1.5-pro' && !isFallbackRun) {
+      console.warn('Gemini 1.5 Pro request failed. Falling back to Gemini 1.5 Flash...', err);
+      try {
+        return await enhancePromptWithGemini(rawPrompt, domain, apiKey, 'gemini-1.5-flash', true);
+      } catch (fallbackErr) {
+        throw fallbackErr;
+      }
+    }
     throw err;
   }
 }
