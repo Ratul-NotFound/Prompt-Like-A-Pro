@@ -71,7 +71,7 @@ export default function App() {
           enhancedText: apiResponse.text,
           additions: [
             { 
-              tag: `${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}${apiResponse.fallbackUsed ? ' (Fallback)' : ''} Meta-Prompt Engine`, 
+              tag: `${apiResponse.actualModelUsed} via ${apiResponse.providerUsed}`, 
               text: apiResponse.text 
             }
           ],
@@ -81,9 +81,9 @@ export default function App() {
         };
 
         if (apiResponse.fallbackUsed) {
-          showToast('Gemini Pro limit reached. Automatically fell back to Gemini Flash!', 'warning');
+          showToast(`Pro limit reached. Automatically fell back to ${apiResponse.actualModelUsed} via ${apiResponse.providerUsed}!`, 'warning');
         } else {
-          showToast(`Enhanced using ${apiResponse.actualModelUsed === 'gemini-1.5-pro' ? 'Gemini 1.5 Pro' : 'Gemini 1.5 Flash'}!`, 'success');
+          showToast(`Enhanced using ${apiResponse.actualModelUsed} (${apiResponse.providerUsed})!`, 'success');
         }
       } catch (apiErr) {
         console.warn('Gemini Live API failed. Falling back to local heuristics:', apiErr);
