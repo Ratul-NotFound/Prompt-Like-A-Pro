@@ -13,23 +13,19 @@ export async function runMultiProviderEnhance(rawPrompt, domain, targetModel = '
   const errors = [];
 
   const systemInstruction = `You are a Master AI Prompt Engineer and AI Meta-Prompting Specialist.
-Your task is to take a raw, unstructured user prompt and transform it into a hyper-optimized, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
+Your task is to take a raw, unstructured user prompt and transform it into a hyper-focused, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
 
-RULES FOR ENHANCEMENT:
-1. Define a clear, expert persona for the AI (e.g. "Act as a...").
-2. Contextualize the objective and elaborate on missing details intelligently.
-3. Add explicit tone, audience, and formatting instructions.
-4. Add domain-specific negative constraints to prevent generic AI fluff.
-5. Use clean Markdown formatting with clear section headers.
-6. DO NOT answer or fulfill the prompt yourself! Your ONLY output must be the ENHANCED PROMPT text itself so the user can copy and paste it into their LLM.`;
+RULES FOR ULTRA-EFFICIENT ENHANCEMENT:
+1. HIGH DENSITY & CONCISE: Keep the generated prompt extremely dense, punchy, and token-efficient (~150-250 words max). Eliminate all fluff and filler.
+2. Define a sharp, expert persona (e.g. "Act as a...").
+3. State the core task objective with sharp context.
+4. Add essential output formatting directives and key negative constraints.
+5. DO NOT answer or fulfill the prompt yourself! Output ONLY the engineered prompt text itself.`;
 
-  const userMessage = `Target Domain: ${domain.name}
-Role/Persona: ${domain.defaultRole}
+  const userMessage = `Domain: ${domain.name} (${domain.defaultRole})
+RAW PROMPT: "${rawPrompt.trim()}"
 
-RAW USER PROMPT TO ENHANCE:
-"${rawPrompt.trim()}"
-
-Please generate the enhanced, professionally engineered prompt now:`;
+Generate the ultra-dense engineered prompt now:`;
 
   // Helper to parse comma-separated keys
   const parseKeys = (val) => {
@@ -169,7 +165,7 @@ async function queryGemini(rawPrompt, domain, apiKey, targetModel, systemInstruc
           ],
           generationConfig: {
             temperature: 0.4,
-            maxOutputTokens: 2000
+            maxOutputTokens: 600
           }
         })
       });
@@ -217,7 +213,7 @@ async function queryOpenAICompatible(url, apiKey, model, systemInstruction, user
         { role: 'user', content: userMessage }
       ],
       temperature: 0.4,
-      max_tokens: 1500
+      max_tokens: 600
     })
   });
 
@@ -252,7 +248,7 @@ async function queryHuggingFace(apiKey, model, systemInstruction, userMessage) {
     body: JSON.stringify({
       inputs: `<|system|>\n${systemInstruction}\n<|user|>\n${userMessage}\n<|assistant|>\n`,
       parameters: {
-        max_new_tokens: 1000,
+        max_new_tokens: 600,
         temperature: 0.4,
         return_full_text: false
       }

@@ -102,62 +102,35 @@ export function enhancePrompt(rawPrompt, domain, settings = {}) {
   }
 
   const cleanRaw = rawPrompt.trim();
-  const additions = [];
-
-  // 1. Role / Identity Priming
+  const additions = [];  // 1. Role & Objective Priming
   const role = settings.role || domain.defaultRole || 'Expert Specialist';
-  const roleSection = `### 🎯 IDENTITY & ROLE
-Act as a ${role}. You possess deep domain expertise, follow production-grade best practices, and deliver authoritative, rigorous outputs.`;
-  additions.push({ tag: 'Role Priming', text: roleSection });
+  const contextText = settings.context ? ` Context: ${settings.context}` : '';
+  const objectiveSection = `**Role:** Act as a ${role}.${contextText}
 
-  // 2. Context & Task Objective (CO-STAR)
-  const contextText = settings.context ? `\n\n**Background Context:**\n${settings.context}` : '';
-  const objectiveSection = `### 📌 TASK OBJECTIVE
-Your task is to fulfill the following core request:${contextText}
-
+**Task Objective:**
 > "${cleanRaw}"`;
-  additions.push({ tag: 'Objective & Context', text: objectiveSection });
+  additions.push({ tag: 'Role & Objective', text: objectiveSection });
 
-  // 3. Style & Tone Directives
+  // 2. Directives & Output Format
   const tone = settings.tone || domain.frameworkDefaults.tone;
-  const audience = settings.audience || domain.frameworkDefaults.audience;
-  const styleSection = `### 🎨 STYLE & TONE DIRECTIVES
-- **Tone:** ${tone}
-- **Target Audience:** ${audience}
-- **Approach:** Direct, structured, and free of fluff. Prioritize quality and depth.`;
-  additions.push({ tag: 'Style & Tone', text: styleSection });
-
-  // 4. Output Format Specifications
   const format = settings.format || domain.frameworkDefaults.format;
-  const formatSection = `### 📋 OUTPUT FORMAT & STRUCTURE
-- Format your response as: ${format}
-- Use clean Markdown with headings, callout blocks, and syntax-highlighted code where appropriate.`;
-  additions.push({ tag: 'Output Format', text: formatSection });
+  const styleSection = `**Directives:**
+- **Tone:** ${tone}
+- **Output Format:** ${format} (Clean, structured Markdown)`;
+  additions.push({ tag: 'Style & Format', text: styleSection });
 
-  // 5. Negative Constraints & Quality Guardrails
+  // 3. Constraints
   const domainConstraints = getDomainConstraints(domain.id);
-  const constraintSection = `### 🛡️ GUARDRAILS & QUALITY CONSTRAINTS
+  const constraintSection = `**Constraints:**
 ${domainConstraints.map(c => `- ${c}`).join('\n')}`;
   additions.push({ tag: 'Constraints', text: constraintSection });
 
-  // 6. Chain-of-Thought (CoT) Directive (Optional)
-  let cotSection = '';
-  if (settings.useCoT !== false) {
-    cotSection = `\n\n### 🧠 REASONING PROCESS
-Before outputting the final result, provide a brief 2-3 sentence step-by-step breakdown of your reasoning under a '### 💡 Reasoning' header.`;
-    additions.push({ tag: 'Chain-of-Thought', text: cotSection });
-  }
-
-  // Combine into Master Prompt
-  const enhancedText = `${roleSection}
-
-${objectiveSection}
+  // Combine into Dense Master Prompt
+  const enhancedText = `${objectiveSection}
 
 ${styleSection}
 
-${formatSection}
-
-${constraintSection}${cotSection}`;
+${constraintSection}`;ntSection}${cotSection}`;
 
   const variables = extractVariables(enhancedText);
 
