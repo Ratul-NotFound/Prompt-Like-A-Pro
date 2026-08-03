@@ -7,6 +7,7 @@
 const GEMINI_MODEL_FALLBACKS = [
   'gemini-2.5-pro',
   'gemini-2.5-flash',
+  'gemini-2.0-flash',
   'gemini-1.5-pro',
   'gemini-1.5-flash'
 ];
@@ -44,10 +45,10 @@ export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model =
 }
 
 // Direct client-side Google API call with automated cascading model fallback
-async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, modelIndex = -1) {
-  const currentModelIndex = modelIndex !== -1 ? modelIndex : GEMINI_MODEL_FALLBACKS.indexOf(targetModel);
-  const activeIndex = currentModelIndex !== -1 ? currentModelIndex : 0;
-  const activeModel = GEMINI_MODEL_FALLBACKS[activeIndex] || 'gemini-2.5-flash';
+async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, modelIndex = 0) {
+  // Guaranteed fallback scan starting from index 0 if index is out of bounds
+  const activeIndex = modelIndex >= 0 && modelIndex < GEMINI_MODEL_FALLBACKS.length ? modelIndex : 0;
+  const activeModel = GEMINI_MODEL_FALLBACKS[activeIndex];
 
   const systemInstruction = `You are a Master AI Prompt Engineer and AI Meta-Prompting Specialist.
 Your task is to take a raw, unstructured user prompt and transform it into a hyper-optimized, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
@@ -90,9 +91,9 @@ Please generate the enhanced, professionally engineered prompt now:`;
       })
     });
 
-    // Check for HTTP 404/429 to cascade down the model list
+    // If active model is rejected (404/429/400), cascade to next fallback model
     if ((response.status === 404 || response.status === 429 || response.status === 400) && activeIndex < GEMINI_MODEL_FALLBACKS.length - 1) {
-      console.warn(`Model ${activeModel} failed (HTTP ${response.status}). Trying next fallback model...`);
+      console.warn(`Model ${activeModel} failed (HTTP ${response.status}). Cascading to fallback model index ${activeIndex + 1}...`);
       return await queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, activeIndex + 1);
     }
 
@@ -115,7 +116,7 @@ Please generate the enhanced, professionally engineered prompt now:`;
     };
   } catch (err) {
     if (activeIndex < GEMINI_MODEL_FALLBACKS.length - 1) {
-      console.warn(`Catch block triggered for ${activeModel}. Falling back to next model...`);
+      console.warn(`Catch block triggered for ${activeModel}. Cascading to next model...`);
       return await queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, activeIndex + 1);
     }
     throw err;
