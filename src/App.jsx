@@ -11,6 +11,8 @@ import VariableModal from './components/VariableModal';
 import SettingsModal from './components/SettingsModal';
 import PromptGuideModal from './components/PromptGuideModal';
 import HistoryDrawer from './components/HistoryDrawer';
+import MobileAppDock from './components/MobileAppDock';
+import MobileScenarioModal from './components/MobileScenarioModal';
 
 export default function App() {
   const [selectedDomain, setSelectedDomain] = useState(DOMAINS[0]);
@@ -43,6 +45,7 @@ export default function App() {
   const [showGuide, setShowGuide] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showVariableModal, setShowVariableModal] = useState(false);
+  const [showMobileScenarioModal, setShowMobileScenarioModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('prompt_pro_theme') || 'dark';
@@ -305,6 +308,33 @@ export default function App() {
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Floating Mobile Bottom App Dock */}
+      <MobileAppDock
+        onToggleTuner={() => {
+          const el = document.querySelector('.costar-tuner-container');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+        isTunerOpen={false}
+        onOpenScenarios={() => setShowMobileScenarioModal(true)}
+        onOpenGuide={() => setShowGuide(true)}
+        onOpenHistory={() => setShowHistory(true)}
+        onEnhance={handleEnhance}
+        isEnhancing={isEnhancing}
+        hasInput={Boolean(rawInput.trim())}
+      />
+
+      {/* Mobile Scenario Sheet Modal */}
+      {showMobileScenarioModal && (
+        <MobileScenarioModal
+          selectedDomain={selectedDomain}
+          onSelectDomain={(dom) => {
+            setSelectedDomain(dom);
+            setTunerSettings({});
+          }}
+          onClose={() => setShowMobileScenarioModal(false)}
         />
       )}
     </div>
