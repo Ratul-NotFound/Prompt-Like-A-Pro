@@ -255,14 +255,18 @@ export default function SketchLayoutWorkbench({
                   <div className="btn-left-content">
                     <CatIcon size={14} className="cat-icon" />
                     <span className="cat-label">{cat.label}</span>
+                    <span className="cat-count">{categoryDomains.length}</span>
                   </div>
                   <ChevronDown size={13} className={`chevron-arrow ${isOpen ? 'rotated' : ''}`} />
                 </button>
 
-                {/* Subcategories Dropdown */}
+                {/* Enhanced Subcategories Dropdown Popover */}
                 {isOpen && (
                   <div className="subcategory-popover-menu animate-fade-in" onClick={(e) => e.stopPropagation()}>
-                    <div className="popover-title">Scenario Blueprints:</div>
+                    <div className="popover-header-bar">
+                      <span className="popover-title">{cat.label} Subcategories</span>
+                      <span className="popover-subtitle">{categoryDomains.length} Specialized Blueprints</span>
+                    </div>
                     <div className="popover-list">
                       {categoryDomains.map((subDomain) => {
                         const SubIcon = ICON_MAP[subDomain.icon] || Sparkles;
@@ -278,9 +282,14 @@ export default function SketchLayoutWorkbench({
                               setOpenCategory(null);
                             }}
                           >
-                            <SubIcon size={14} className="sub-icon" />
+                            <div className="sub-icon-wrapper">
+                              <SubIcon size={14} className="sub-icon" />
+                            </div>
                             <div className="sub-details">
-                              <span className="sub-title">{subDomain.name}</span>
+                              <div className="sub-header-row">
+                                <span className="sub-title">{subDomain.name}</span>
+                                {subDomain.badge && <span className="sub-badge">{subDomain.badge}</span>}
+                              </div>
                               <span className="sub-desc">{subDomain.description}</span>
                             </div>
                             {isSelected && <Check size={14} className="check-icon" />}
@@ -670,73 +679,165 @@ export default function SketchLayoutWorkbench({
           transform: rotate(180deg);
         }
 
+        .cat-count {
+          font-size: 0.625rem;
+          font-weight: 700;
+          background: var(--bg-subtle);
+          color: var(--text-muted);
+          padding: 0.05rem 0.35rem;
+          border-radius: 99px;
+          border: 1px solid var(--border-subtle);
+          margin-left: 0.15rem;
+        }
+
+        .category-suggestion-btn.active-parent .cat-count {
+          background: rgba(16, 185, 129, 0.15);
+          color: #10B981;
+          border-color: rgba(16, 185, 129, 0.3);
+        }
+
         /* Subcategories Popover */
         .subcategory-popover-menu {
           position: absolute;
-          top: calc(100% + 4px);
+          top: calc(100% + 6px);
           left: 0;
-          min-width: 250px;
+          min-width: 320px;
+          max-width: 380px;
           z-index: 999;
-          background: #202020;
+          background: var(--bg-surface);
           border: 1px solid var(--border-medium);
           border-radius: var(--radius-md);
-          padding: 0.4rem;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+          padding: 0.6rem;
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(12px);
+        }
+
+        .popover-header-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.3rem 0.4rem 0.6rem 0.4rem;
+          border-bottom: 1px solid var(--border-subtle);
+          margin-bottom: 0.4rem;
         }
 
         .popover-title {
-          font-size: 0.675rem;
+          font-size: 0.725rem;
           font-weight: 700;
-          color: var(--text-muted);
+          color: var(--text-primary);
           text-transform: uppercase;
-          padding: 0.2rem 0.4rem;
+          letter-spacing: 0.04em;
+        }
+
+        .popover-subtitle {
+          font-size: 0.65rem;
+          color: var(--text-muted);
         }
 
         .popover-list {
           display: flex;
           flex-direction: column;
-          gap: 0.2rem;
+          gap: 0.25rem;
+          max-height: 280px;
+          overflow-y: auto;
         }
 
         .popover-item {
           display: flex;
-          align-items: flex-start;
-          gap: 0.5rem;
-          padding: 0.5rem;
+          align-items: center;
+          gap: 0.65rem;
+          padding: 0.55rem 0.65rem;
           border-radius: var(--radius-sm);
           background: transparent;
-          border: none;
+          border: 1px solid transparent;
           color: var(--text-secondary);
           cursor: pointer;
           text-align: left;
           width: 100%;
-          transition: background var(--transition-fast);
+          transition: background var(--transition-fast), border-color var(--transition-fast);
         }
 
         .popover-item:hover {
-          background: rgba(255, 255, 255, 0.05);
+          background: var(--bg-subtle);
+          border-color: var(--border-subtle);
           color: var(--text-primary);
         }
 
         .popover-item.selected {
-          background: rgba(255, 255, 255, 0.08);
+          background: rgba(16, 185, 129, 0.08);
+          border-color: rgba(16, 185, 129, 0.25);
           color: var(--text-primary);
         }
 
+        .sub-icon-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
+          background: var(--bg-input);
+          border: 1px solid var(--border-subtle);
+          flex-shrink: 0;
+        }
+
+        .popover-item.selected .sub-icon-wrapper {
+          background: rgba(16, 185, 129, 0.15);
+          border-color: rgba(16, 185, 129, 0.4);
+        }
+
         .sub-icon {
-          margin-top: 2px;
-          color: var(--text-muted);
+          color: var(--text-secondary);
+        }
+
+        .popover-item.selected .sub-icon {
+          color: #10B981;
         }
 
         .sub-details {
           flex: 1;
           display: flex;
           flex-direction: column;
+          gap: 0.15rem;
+        }
+
+        .sub-header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
         }
 
         .sub-title {
           font-size: 0.8rem;
           font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        .sub-badge {
+          font-size: 0.625rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          padding: 0.08rem 0.4rem;
+          border-radius: 4px;
+          background: var(--bg-input);
+          color: #10B981;
+          border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .sub-desc {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          line-height: 1.35;
+        }
+
+        .check-icon {
+          color: #10B981;
+          flex-shrink: 0;
         }
 
         .sub-desc {
