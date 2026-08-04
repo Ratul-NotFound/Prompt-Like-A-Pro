@@ -26,7 +26,12 @@ import {
   MessageSquare,
   ChevronDown,
   ArrowUp,
-  Award
+  Award,
+  Database,
+  TrendingUp,
+  HelpCircle,
+  Mail,
+  Workflow
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -40,11 +45,19 @@ const ICON_MAP = {
   PenTool,
   MessageSquare,
   Sparkles,
-  Cpu
+  Cpu,
+  Terminal,
+  Database,
+  TrendingUp,
+  HelpCircle,
+  Mail,
+  Zap,
+  Workflow
 };
 
 const CATEGORY_CONFIG = [
   { id: 'Coding', label: 'Coding', icon: Code },
+  { id: 'Business', label: 'Business', icon: TrendingUp },
   { id: 'Study', label: 'Academics', icon: BookOpen },
   { id: 'Writing', label: 'Writing', icon: PenTool },
   { id: 'Visuals', label: 'Visuals', icon: Sparkles },

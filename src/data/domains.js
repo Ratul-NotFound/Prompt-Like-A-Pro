@@ -38,6 +38,44 @@ export const DOMAINS = [
     ]
   },
   {
+    id: 'coding-devops',
+    name: 'DevOps, Docker & Cloud Infra',
+    category: 'Coding',
+    icon: 'Terminal',
+    badge: 'DevOps',
+    color: '#FAFAFA',
+    description: 'Generate multi-stage Dockerfiles, Kubernetes manifests, GitHub Actions CI/CD pipelines, and Terraform IaC code.',
+    defaultRole: 'Lead DevOps Architect & Cloud Infrastructure Engineer',
+    frameworkDefaults: {
+      tone: 'Production-Ready, Automated, Highly Available',
+      audience: 'DevOps Engineers, SREs & Cloud Developers',
+      format: 'Production Dockerfile/YAML manifests with security best practices & inline comments'
+    },
+    examples: [
+      'Create a multi-stage Dockerfile for a Next.js production app minimizing image footprint to under 100MB.',
+      'Write a GitHub Actions workflow to build, test, and deploy a Docker container to AWS ECR.'
+    ]
+  },
+  {
+    id: 'coding-data',
+    name: 'Data Science & SQL Query',
+    category: 'Coding',
+    icon: 'Database',
+    badge: 'Data',
+    color: '#FAFAFA',
+    description: 'Construct complex SQL analytical queries, Pandas ETL pipelines, ML model prompts, and analytics dashboards.',
+    defaultRole: 'Principal Data Engineer & Analytics Architect',
+    frameworkDefaults: {
+      tone: 'Analytical, High-Performance, Precise',
+      audience: 'Data Scientists, Analysts & Database Engineers',
+      format: 'Optimized SQL queries with EXPLAIN ANALYZE notes and Pandas data pipeline code'
+    },
+    examples: [
+      'Write an optimized PostgreSQL query using Window Functions to calculate month-over-month revenue growth.',
+      'Build a Python Pandas data cleaning pipeline that handles missing values, outlier detection, and encoding.'
+    ]
+  },
+  {
     id: 'coding-security',
     name: 'Security & Vulnerability Audit',
     category: 'Coding',
@@ -114,6 +152,25 @@ export const DOMAINS = [
     ]
   },
   {
+    id: 'study-exam',
+    name: 'Exam Prep & Quiz Generator',
+    category: 'Study',
+    icon: 'HelpCircle',
+    badge: 'Study',
+    color: '#FAFAFA',
+    description: 'Generate realistic multiple-choice practice exams, grading rubrics, and detailed explanation keys.',
+    defaultRole: 'Master Exam Creator & Educational Assessment Specialist',
+    frameworkDefaults: {
+      tone: 'Rigorous, Objective, Educational',
+      audience: 'Exam Candidates & Self-Assessors',
+      format: 'Numbered MCQs with 4 options (A-D) + Answer Key with detailed explanations'
+    },
+    examples: [
+      'Generate 5 multiple-choice practice questions for AWS Certified Solutions Architect Associate exam.',
+      'Create a practice quiz on Organic Chemistry functional groups with detailed answer explanations.'
+    ]
+  },
+  {
     id: 'study-research',
     name: 'Paper Summarizer & Literature',
     category: 'Study',
@@ -153,7 +210,7 @@ export const DOMAINS = [
   },
   {
     id: 'writing-social',
-    name: 'Social Thread & Outreach Email',
+    name: 'Social Thread & Outreach',
     category: 'Writing',
     icon: 'MessageSquare',
     badge: 'Writing',
@@ -168,6 +225,44 @@ export const DOMAINS = [
     examples: [
       'Create a 7-slide LinkedIn carousel script sharing 5 prompt engineering tips for developers.',
       'Write a personalized B2B cold email pitching a software development agency to tech startups.'
+    ]
+  },
+  {
+    id: 'writing-email',
+    name: 'Executive Email & Proposal',
+    category: 'Writing',
+    icon: 'Mail',
+    badge: 'Writing',
+    color: '#FAFAFA',
+    description: 'Craft professional executive emails, client proposals, salary negotiations, and high-stakes corporate updates.',
+    defaultRole: 'Executive Communications Director & Corporate Copywriter',
+    frameworkDefaults: {
+      tone: 'Polished, Professional, High-Impact',
+      audience: 'Executives, Stakeholders, High-Value Clients',
+      format: 'Clear Subject Line + Executive Summary + Bulleted Core Points + Next Steps CTA'
+    },
+    examples: [
+      'Write a high-stakes project delay email to enterprise clients maintaining confidence and trust.',
+      'Draft a persuasive executive proposal asking for budget approval to upgrade team developer tooling.'
+    ]
+  },
+  {
+    id: 'business-strategy',
+    name: 'Business Strategy & Pitch Deck',
+    category: 'Business',
+    icon: 'TrendingUp',
+    badge: 'Business',
+    color: '#FAFAFA',
+    description: 'Structure startup pitch deck slides, Go-To-Market (GTM) strategy, SWOT analysis, and business business models.',
+    defaultRole: 'Principal Business Strategist & Venture Architect',
+    frameworkDefaults: {
+      tone: 'Strategic, Data-Driven, Investor-Ready',
+      audience: 'Venture Capitalists, Founders & Executives',
+      format: '10-Slide Pitch Deck Outline + GTM Execution Plan + Competitive Moat Analysis'
+    },
+    examples: [
+      'Create a 10-slide pitch deck structure for a B2B SaaS startup revolutionizing developer workflow.',
+      'Perform a SWOT analysis and Go-To-Market strategy for launching an AI-powered design tool.'
     ]
   },
   {
@@ -207,16 +302,34 @@ export const DOMAINS = [
       'Create a system prompt for a Customer Support AI Agent that strictly adheres to company policy and never reveals private keys.',
       'Build a system prompt for a Python Code Tutor that guides students with hints instead of providing direct solutions.'
     ]
+  },
+  {
+    id: 'ai-agent',
+    name: 'AI Agent & Function Calling',
+    category: 'AI Systems',
+    icon: 'Workflow',
+    badge: 'AI Systems',
+    color: '#FAFAFA',
+    description: 'Design JSON function calling schemas, tool definitions, multi-step agent workflows, and API tool payloads.',
+    defaultRole: 'Chief AI Agent Engineer & Function Calling Specialist',
+    frameworkDefaults: {
+      tone: 'Deterministic, Precise, Schema-Compliant',
+      audience: 'AI Developers & Autonomous Agent Runtimes',
+      format: 'Valid OpenAPI / JSON Function Tool Schema + Agent State Machine Breakdown'
+    },
+    examples: [
+      'Design an OpenAI Function Calling JSON schema for a weather and flight search agent tool.',
+      'Build a multi-agent workflow definition for an automated code reviewer and test generator.'
+    ]
   }
 ];
 
 export const CATEGORIES = [
   { id: 'All', name: 'All Scenarios' },
   { id: 'Coding', name: 'Coding & Engineering' },
-  { id: 'Security', name: 'Security Auditing' },
-  { id: 'Study', name: 'Study & Learning' },
-  { id: 'Research', name: 'Research & Academics' },
+  { id: 'Business', name: 'Business & Strategy' },
+  { id: 'Study', name: 'Study & Academics' },
   { id: 'Writing', name: 'Content & Social' },
   { id: 'Visuals', name: 'AI Image Prompts' },
-  { id: 'AI Systems', name: 'System Prompts' }
+  { id: 'AI Systems', name: 'System & Agent Prompts' }
 ];
