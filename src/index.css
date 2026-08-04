@@ -367,126 +367,310 @@ html, body {
 }
 
 /* ==========================================================================
-   MOBILE RESPONSIVE ENHANCEMENTS (Desktop mode remains 100% unchanged)
+   MOBILE-SPECIFIC HIGH-PERFORMANCE RESPONSIVE DESIGN SYSTEM
+   (Desktop mode > 768px remains 100% untouched)
    ========================================================================== */
 
 @media (max-width: 768px) {
-  /* Main Container Spacing */
+  /* 1. Page Canvas & Layout Spacing */
   .main-content {
-    padding: 1rem 0.85rem 3rem 0.85rem;
+    padding: 0.75rem 0.75rem 3rem 0.75rem !important;
   }
 
-  /* Chat Input Area */
-  .chat-input-container {
-    padding: 0.85rem;
+  /* 2. Navbar Mobile Touch Enhancements */
+  .navbar-inner {
+    padding: 0.75rem 0.85rem !important;
   }
 
-  .chat-textarea {
-    font-size: 16px !important; /* Prevents iOS browser auto-zooming */
-    min-height: 100px;
-    padding: 0.65rem 0.75rem;
-  }
-
-  .input-action-bar {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .btn-enhance-submit {
-    width: 100%;
-    justify-content: center;
-    padding: 0.65rem 1rem;
-    font-size: 0.85rem;
-  }
-
-  /* Scenario Blueprint Category Cards - Touch Scroll Bar */
-  .categories-grid {
-    display: flex !important;
-    overflow-x: auto !important;
+  .brand-group {
     gap: 0.4rem !important;
-    padding-bottom: 0.4rem !important;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-  }
-
-  .category-card {
-    flex: 0 0 auto !important;
-    scroll-snap-align: start;
-    padding: 0.45rem 0.75rem !important;
-  }
-
-  .category-label {
-    font-size: 0.75rem !important;
-  }
-
-  /* Dropdown Popover on Mobile */
-  .subcategory-popover-menu {
-    position: fixed !important;
-    left: 0.85rem !important;
-    right: 0.85rem !important;
-    width: calc(100vw - 1.7rem) !important;
-    max-width: 480px !important;
-    margin: 0 auto !important;
-    z-index: 1000 !important;
-  }
-
-  /* Response Card & Footer Actions */
-  .response-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .response-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-    padding: 0.75rem;
-  }
-
-  .footer-right-actions {
-    flex-wrap: wrap;
-    width: 100%;
-    gap: 0.4rem;
-  }
-
-  .footer-right-actions .btn {
-    flex: 1 1 calc(50% - 0.4rem);
-    justify-content: center;
-    font-size: 0.725rem;
-    padding: 0.45rem 0.6rem;
-  }
-
-  /* History Drawer Slideout */
-  .drawer-panel {
-    max-width: 85vw !important;
-  }
-
-  /* Modals */
-  .modal-content {
-    width: 92vw !important;
-    max-height: 85vh !important;
-    padding: 1.15rem !important;
-  }
-
-  /* Parameters Tuner */
-  .tuner-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-content {
-    font-size: 0.75rem;
-    padding: 0 0.5rem;
   }
 
   .brand-title {
     font-size: 0.7rem !important;
-    letter-spacing: 0.1em !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .navbar-actions {
+    gap: 0.5rem !important;
+  }
+
+  .nav-link-btn {
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.7rem !important;
+    min-height: 36px;
+    border-radius: 6px;
+    background: var(--bg-subtle);
+  }
+
+  .nav-link-btn span {
+    display: inline !important;
+  }
+
+  /* 3. Parameters Tuner (COStarTuner) Mobile Layout */
+  .tuner-header {
+    padding: 0.75rem 0.85rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .header-left-title {
+    gap: 0.4rem !important;
+  }
+
+  .tuner-title {
+    font-size: 0.825rem !important;
+  }
+
+  .tuner-body {
+    padding: 0.85rem !important;
+  }
+
+  .tuner-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .tuner-input, .tuner-textarea {
+    font-size: 14px !important;
+    min-height: 42px;
+    padding: 0.55rem 0.75rem !important;
+  }
+
+  .cot-toggle-bar {
+    padding: 0.55rem 0.75rem !important;
+  }
+
+  /* 4. Chat Input & Workbench Controls */
+  .chat-input-container {
+    padding: 0.75rem !important;
+    border-radius: 12px !important;
+  }
+
+  .strength-meter-container {
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  .strength-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+  }
+
+  .strength-feedback {
+    font-size: 0.7rem !important;
+  }
+
+  .chat-input-box {
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  .chat-textarea {
+    font-size: 16px !important; /* Prevents mobile Safari auto-zoom */
+    min-height: 105px !important;
+    line-height: 1.45 !important;
+  }
+
+  .input-action-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+  }
+
+  .action-bar-left {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .send-enhance-btn {
+    width: 100% !important;
+    height: 44px !important;
+    border-radius: 8px !important;
+    justify-content: center !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Suggestion Starters */
+  .suggestions-deck-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+  }
+
+  .suggestion-deck-card {
+    width: 100% !important;
+    text-align: left !important;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* 5. Scenario Blueprint Categories Bar */
+  .categories-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.2rem !important;
+  }
+
+  .categories-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 0.4rem !important;
+    padding-bottom: 0.5rem !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .category-suggestion-wrapper {
+    flex: 0 0 auto !important;
+    scroll-snap-align: start;
+  }
+
+  .category-suggestion-btn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Fixed Mobile Popover Bottom Sheet */
+  .subcategory-popover-menu {
+    position: fixed !important;
+    left: 0.75rem !important;
+    right: 0.75rem !important;
+    bottom: 1rem !important;
+    top: auto !important;
+    width: calc(100vw - 1.5rem) !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    z-index: 1050 !important;
+    max-height: 75vh !important;
+    overflow-y: auto !important;
+    border-radius: 16px !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  /* 6. Response Output Section */
+  .chat-response-section {
+    border-radius: 12px !important;
+  }
+
+  .response-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 0.85rem !important;
+  }
+
+  .view-mode-tabs {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .tab-btn {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 0.35rem 0.4rem !important;
+  }
+
+  .response-body {
+    padding: 0.85rem !important;
+  }
+
+  .chatbot-code-display {
+    padding: 0.75rem !important;
+    font-size: 0.775rem !important;
+    max-height: 300px !important;
+  }
+
+  .response-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 0.85rem !important;
+  }
+
+  .footer-left-stats {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .footer-right-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 0.4rem !important;
   }
 
   .footer-right-actions .btn {
-    flex: 1 1 100%;
+    flex: 1 1 calc(50% - 0.4rem) !important;
+    height: 40px !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* 7. Prompt Guide Modal Mobile Touch Overhaul */
+  .guide-modal {
+    width: 95vw !important;
+    max-height: 90vh !important;
+    border-radius: 16px !important;
+  }
+
+  .guide-toolbar {
+    padding: 0.65rem 0.85rem !important;
+  }
+
+  .guide-tabs-bar {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .guide-body {
+    padding: 0.85rem !important;
+  }
+
+  .comparison-box {
+    gap: 0.5rem !important;
+  }
+
+  .comp-item {
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  /* Matrix Table on small screens */
+  .matrix-table th, .matrix-table td {
+    padding: 0.55rem 0.65rem !important;
+    font-size: 0.725rem !important;
+  }
+
+  /* 8. Drawers & Modals */
+  .drawer-panel {
+    max-width: 88vw !important;
+  }
+
+  .modal-content {
+    width: 94vw !important;
+    max-height: 88vh !important;
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-link-btn span {
+    display: none !important;
+  }
+
+  .brand-title {
+    font-size: 0.65rem !important;
+  }
+
+  .footer-right-actions .btn {
+    flex: 1 1 100% !important;
+  }
+
+  .footer-content {
+    font-size: 0.725rem !important;
+    padding: 0 0.5rem !important;
   }
 }
