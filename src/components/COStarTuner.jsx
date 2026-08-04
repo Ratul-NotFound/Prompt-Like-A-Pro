@@ -178,8 +178,27 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
         }
 
         @media (max-width: 640px) {
+          .tuner-header {
+            padding: 0.65rem 0.85rem;
+          }
+          .tuner-sub {
+            display: none;
+          }
+          .tuner-title {
+            font-size: 0.8rem;
+          }
           .tuner-grid {
             grid-template-columns: 1fr;
+            gap: 0.65rem;
+          }
+          .cot-toggle-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+          }
+          .switch-container {
+            width: 100%;
+            justify-content: space-between;
           }
         }
 

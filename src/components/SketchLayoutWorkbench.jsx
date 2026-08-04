@@ -203,7 +203,10 @@ export default function SketchLayoutWorkbench({
               {isEnhancing ? (
                 <div className="chat-spinner" />
               ) : (
-                <ArrowUp size={18} />
+                <>
+                  <ArrowUp size={18} />
+                  <span className="btn-label-text">Enhance Prompt</span>
+                </>
               )}
             </button>
           </div>
@@ -960,18 +963,34 @@ export default function SketchLayoutWorkbench({
           margin-right: 0.25rem;
         }
 
+        .btn-label-text {
+          display: none;
+        }
+
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
-          .categories-grid {
-            grid-template-columns: 1fr;
+          .btn-label-text {
+            display: inline-block;
+            margin-left: 0.35rem;
           }
-          .subcategory-popover-menu {
-            position: relative;
-            top: 0;
-            margin-top: 0.4rem;
+          .chat-input-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+          }
+          .left-helpers {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .send-enhance-btn {
+            width: 100%;
+            height: 42px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
           }
         }
       `}</style>

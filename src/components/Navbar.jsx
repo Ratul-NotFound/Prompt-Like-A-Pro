@@ -173,11 +173,39 @@ export default function Navbar({ onOpenGuide, onToggleHistory, theme, onToggleTh
         }
 
         @media (max-width: 640px) {
+          .navbar-inner {
+            padding: 0.65rem 0.85rem;
+          }
+          .brand-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+          }
+          .navbar-actions {
+            gap: 0.35rem;
+          }
+          .nav-link-btn {
+            padding: 0.35rem 0.55rem;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            font-size: 0.7rem;
+          }
+          .nav-link-btn span {
+            display: inline;
+          }
+          .nav-divider, .engine-status-tag {
+            display: none;
+          }
+        }
+        @media (max-width: 400px) {
+          .brand-title {
+            font-size: 0.65rem;
+          }
           .nav-link-btn span {
             display: none;
           }
-          .status-dot-label {
-            display: none;
+          .nav-link-btn {
+            padding: 0.4rem;
           }
         }
       `}</style>
