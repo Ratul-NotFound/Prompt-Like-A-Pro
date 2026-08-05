@@ -16,38 +16,43 @@ export default function Navbar({ onOpenGuide, onToggleHistory, theme, onToggleTh
           <button 
             className="nav-link-btn"
             onClick={onToggleTheme}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
             title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
           >
-            {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+            {theme === 'light' ? <Moon size={14} aria-hidden="true" /> : <Sun size={14} aria-hidden="true" />}
             <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
           </button>
 
           <button 
             className="nav-link-btn"
             onClick={onOpenGuide}
+            aria-label="Open prompting playbook guide"
             title="Read Prompting Guide"
           >
-            <BookOpen size={13} />
+            <BookOpen size={13} aria-hidden="true" />
             <span>Guide</span>
           </button>
 
           <button 
             className="nav-link-btn"
             onClick={onToggleHistory}
+            aria-label="View saved prompt history"
             title="View History"
           >
-            <History size={13} />
+            <History size={13} aria-hidden="true" />
             <span>History</span>
           </button>
 
-          <div className="nav-divider" />
+          <div className="nav-divider" role="separator" />
 
           {/* Minimal Status Dot on the right */}
           <div 
             className="engine-status-tag active"
             title="Multi-Provider AI Rotation Pool Active"
+            role="status"
+            aria-live="polite"
           >
-            <span className="status-dot-core" />
+            <span className="status-dot-core" aria-hidden="true" />
             <span className="status-dot-label">AI ENGINE</span>
           </div>
 
@@ -56,9 +61,10 @@ export default function Navbar({ onOpenGuide, onToggleHistory, theme, onToggleTh
             target="_blank"
             rel="noopener noreferrer"
             className="github-nav-link"
+            aria-label="View source code on GitHub"
             title="GitHub Repository"
           >
-            <Github size={14} />
+            <Github size={14} aria-hidden="true" />
           </a>
         </div>
       </div>
