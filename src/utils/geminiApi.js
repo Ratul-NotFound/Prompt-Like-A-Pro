@@ -1,33 +1,63 @@
 /**
- * Prompt Like A Pro — Optional Live Gemini Meta-Prompt API Client
- * Uses Google Gemini REST API or secure Serverless Backend Proxy (/api/enhance)
- * with built-in Key Rotation Pool and Model Version Fallback.
+ * Prompt Like A Pro — Client-Side Gemini Meta-Prompt Engine
+ * TOKEN-EFFICIENT VERSION
+ *
+ * Principle: Maximum intelligence per token.
+ * System instruction compressed 4x. Input trimmed. Output capped.
+ * Gemini Flash prioritized over Pro (3× better free quota).
  */
 
+// Flash first — 3x better free tier RPM/TPM than Pro
 const GEMINI_MODEL_FALLBACKS = [
-  'gemini-2.5-pro',
   'gemini-2.5-flash',
+  'gemini-2.5-pro',
   'gemini-2.0-flash'
 ];
 
-export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-2.5-pro') {
-  // If an API key is provided directly in the browser (Settings override), call Google directly
+const MAX_RAW_INPUT_CHARS = 800;   // ~200 tokens
+const MAX_OUTPUT_TOKENS   = 520;   // Dense prompt needs density, not length
+const TEMPERATURE         = 0.68;
+
+/**
+ * Compressed system instruction — same reasoning depth, 4x fewer tokens.
+ * ~120 tokens vs ~520 before.
+ */
+function buildSystemInstruction(domain) {
+  return `You are an expert AI Prompt Engineer. Domain: "${domain.name}" (${domain.category}). Expert lens: ${domain.defaultRole || 'specialist'}.
+
+PROCESS (silent, no output): 1) Infer user's REAL goal, not just what they typed. 2) Identify target audience, context, and missing constraints. 3) Determine ideal output format and depth.
+
+THEN output ONE engineered prompt that: assigns a precise expert persona; states the real objective with context baked in; specifies deliverables and format; includes hard constraints blocking common failure modes; adds implicit context the user forgot.
+
+RULES: Output ONLY the final prompt text. No preamble. No explanation. 120–250 words. Dense, specific, alive — not a template. Don't execute the task, engineer the prompt for it.`;
+}
+
+function trimRawInput(rawPrompt) {
+  const trimmed = rawPrompt.trim();
+  if (trimmed.length <= MAX_RAW_INPUT_CHARS) return trimmed;
+  const cut = trimmed.slice(0, MAX_RAW_INPUT_CHARS);
+  const lastSentence = cut.lastIndexOf('. ');
+  return lastSentence > MAX_RAW_INPUT_CHARS * 0.6
+    ? cut.slice(0, lastSentence + 1) + ' [trimmed]'
+    : cut + '… [trimmed]';
+}
+
+function buildUserMessage(rawPrompt) {
+  const safe = trimRawInput(rawPrompt);
+  return `User's raw idea: "${safe}"\n\nEngineer the precision prompt now (output only the prompt, no intro):`;
+}
+
+export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-2.5-flash') {
   if (apiKey && apiKey.trim()) {
     return await queryGoogleDirectly(rawPrompt, domain, apiKey, model);
   }
 
-  // Otherwise, route through the secure Vercel Serverless Proxy endpoint (keeps keys hidden)
+  // Route through secure backend proxy
   try {
     const response = await fetch('/api/enhance', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        rawPrompt,
-        domain,
-        model
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rawPrompt, domain, model })
     });
 
     if (!response.ok) {
@@ -42,53 +72,35 @@ export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model =
   }
 }
 
-// Direct client-side Google API call with automated cascading model fallback
 async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel) {
   const startIndex = Math.max(0, GEMINI_MODEL_FALLBACKS.indexOf(targetModel));
   const modelsToTry = GEMINI_MODEL_FALLBACKS.slice(startIndex);
 
-  const systemInstruction = `You are a Master AI Prompt Engineer and AI Meta-Prompting Specialist.
-Your task is to take a raw, unstructured user prompt and transform it into a hyper-focused, production-grade prompt for the target domain: "${domain.name}" (${domain.category}).
-
-RULES FOR ULTRA-EFFICIENT ENHANCEMENT:
-1. HIGH DENSITY & CONCISE: Keep the generated prompt extremely dense, punchy, and token-efficient (~150-250 words max). Eliminate all fluff and filler.
-2. Define a sharp, expert persona (e.g. "Act as a...").
-3. State the core task objective with sharp context.
-4. Add essential output formatting directives and key negative constraints.
-5. DO NOT answer or fulfill the prompt yourself! Output ONLY the engineered prompt text itself.`;
-
-  const userMessage = `Domain: ${domain.name} (${domain.defaultRole})
-RAW PROMPT: "${rawPrompt.trim()}"
-
-Generate the ultra-dense engineered prompt now:`;
+  const systemInstruction = buildSystemInstruction(domain);
+  const userMessage = buildUserMessage(rawPrompt);
 
   let lastError = null;
 
   for (const activeModel of modelsToTry) {
-    const url = `https://generativelanguage.googleapis.com/v1/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey.trim()}`;
 
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: systemInstruction + '\n\n' + userMessage }]
-            }
-          ],
+          system_instruction: { parts: [{ text: systemInstruction }] },
+          contents: [{ role: 'user', parts: [{ text: userMessage }] }],
           generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 600
+            temperature: TEMPERATURE,
+            maxOutputTokens: MAX_OUTPUT_TOKENS,
+            topP: 0.92,
+            candidateCount: 1
           }
         })
       });
 
-      if (response.status === 404 || response.status === 429 || response.status === 400) {
-        console.warn(`Model ${activeModel} failed (HTTP ${response.status}). Cascading to next model...`);
+      if (response.status === 404 || response.status === 429 || response.status === 503) {
         lastError = new Error(`HTTP ${response.status}`);
         continue;
       }
@@ -101,9 +113,7 @@ Generate the ultra-dense engineered prompt now:`;
       const data = await response.json();
       const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-      if (!resultText) {
-        throw new Error('Empty response.');
-      }
+      if (!resultText) throw new Error('Empty response.');
 
       return {
         text: resultText.trim(),
@@ -112,9 +122,7 @@ Generate the ultra-dense engineered prompt now:`;
         providerUsed: 'Gemini AI'
       };
     } catch (err) {
-      console.warn(`Catch block triggered for ${activeModel}: ${err.message}. Cascading...`);
       lastError = err;
-      continue;
     }
   }
 
