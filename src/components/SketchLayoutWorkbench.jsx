@@ -181,15 +181,37 @@ export default function SketchLayoutWorkbench({
             rows={3}
             value={rawInput}
             onChange={(e) => onRawInputChange(e.target.value)}
-            placeholder={`How can I help you prompt today? Ask anything...\n\nActive Scenario: ${selectedDomain.name}`}
+            placeholder={`How can I help you prompt today? Ask anything…\n\nActive Scenario: ${selectedDomain.name}`}
+            aria-label="Raw prompt input"
           />
 
           <div className="chat-input-actions">
             <div className="left-helpers">
-              <span className="char-counter">{rawInput.length} chars</span>
+              {/* Live Token Budget Meter */}
+              {(() => {
+                const inputTokens = Math.ceil(rawInput.length / 4);
+                const MAX_SAFE = 200; // ~800 chars
+                const pct = Math.min(100, Math.round((inputTokens / MAX_SAFE) * 100));
+                const color = inputTokens <= 120 ? '#10B981' : inputTokens <= 180 ? '#F59E0B' : '#EF4444';
+                const label = inputTokens <= 120 ? 'Efficient' : inputTokens <= 180 ? 'Near limit' : 'Will trim';
+                return (
+                  <div className="token-budget-meter" title={`~${inputTokens} input tokens. System uses ~120t. Total ≈ ${inputTokens + 120}t sent per request.`}>
+                    <span className="token-count-label" style={{ color }}>~{inputTokens}t</span>
+                    <div className="token-bar-track">
+                      <div className="token-bar-fill" style={{ width: `${pct}%`, background: color }} />
+                    </div>
+                    <span className="token-state-label" style={{ color }}>{label}</span>
+                  </div>
+                );
+              })()}
               {rawInput && (
-                <button className="reset-btn" onClick={() => onRawInputChange('')} title="Reset">
-                  <RotateCcw size={14} />
+                <button 
+                  className="reset-btn" 
+                  onClick={() => onRawInputChange('')} 
+                  title="Reset input"
+                  aria-label="Clear input prompt text"
+                >
+                  <RotateCcw size={14} aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -199,12 +221,13 @@ export default function SketchLayoutWorkbench({
               onClick={onEnhance}
               disabled={!rawInput.trim() || isEnhancing}
               title="Enhance Prompt Now"
+              aria-label="Enhance prompt now"
             >
               {isEnhancing ? (
-                <div className="chat-spinner" />
+                <div className="chat-spinner" aria-label="Enhancing prompt..." />
               ) : (
                 <>
-                  <ArrowUp size={18} />
+                  <ArrowUp size={18} aria-hidden="true" />
                   <span className="btn-label-text">Enhance Prompt</span>
                 </>
               )}
@@ -361,24 +384,62 @@ export default function SketchLayoutWorkbench({
             </div>
 
             <div className="footer-right-actions">
-              <button className="btn btn-ghost btn-sm" onClick={() => onSaveToHistory(enhancedResult)}>
-                <Star size={14} />
+              {/* Direct LLM Model Launcher Shortcuts */}
+              <div className="llm-launcher-group" title="Copy & Launch Directly in AI Provider">
+                <span className="launcher-label">Launch in:</span>
+                <button 
+                  className="btn-launcher"
+                  onClick={() => {
+                    handleCopyClick();
+                    window.open('https://chatgpt.com', '_blank');
+                  }}
+                  title="Copy Prompt & Open ChatGPT"
+                  aria-label="Copy and open in ChatGPT"
+                >
+                  <span>ChatGPT</span>
+                </button>
+                <button 
+                  className="btn-launcher"
+                  onClick={() => {
+                    handleCopyClick();
+                    window.open('https://claude.ai/new', '_blank');
+                  }}
+                  title="Copy Prompt & Open Claude"
+                  aria-label="Copy and open in Claude"
+                >
+                  <span>Claude</span>
+                </button>
+                <button 
+                  className="btn-launcher"
+                  onClick={() => {
+                    handleCopyClick();
+                    window.open('https://gemini.google.com', '_blank');
+                  }}
+                  title="Copy Prompt & Open Gemini"
+                  aria-label="Copy and open in Gemini"
+                >
+                  <span>Gemini</span>
+                </button>
+              </div>
+
+              <button className="btn btn-ghost btn-sm" onClick={() => onSaveToHistory(enhancedResult)} aria-label="Save to history">
+                <Star size={14} aria-hidden="true" />
                 <span>Save</span>
               </button>
 
-              <button className="btn btn-secondary btn-sm" onClick={handleExportMarkdown}>
-                <Download size={14} />
+              <button className="btn btn-secondary btn-sm" onClick={handleExportMarkdown} aria-label="Export as markdown file">
+                <Download size={14} aria-hidden="true" />
                 <span>Export .md</span>
               </button>
 
               {enhancedResult.variables?.length > 0 ? (
-                <button className="btn btn-emerald btn-sm" onClick={onOpenVariableModal}>
-                  <Sliders size={14} />
+                <button className="btn btn-emerald btn-sm" onClick={onOpenVariableModal} aria-label="Fill template variables">
+                  <Sliders size={14} aria-hidden="true" />
                   <span>Fill Variables</span>
                 </button>
               ) : (
-                <button className="btn btn-primary btn-sm" onClick={handleCopyClick}>
-                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                <button className="btn btn-primary btn-sm" onClick={handleCopyClick} aria-label="Copy enhanced prompt">
+                  {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
                   <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
                 </button>
               )}
@@ -445,6 +506,42 @@ export default function SketchLayoutWorkbench({
         .char-counter {
           font-size: 0.725rem;
           color: var(--text-muted);
+        }
+
+        /* Token Budget Meter */
+        .token-budget-meter {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          cursor: default;
+        }
+
+        .token-count-label {
+          font-size: 0.7rem;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+          min-width: 2.8rem;
+          transition: color 0.2s;
+        }
+
+        .token-bar-track {
+          width: 48px;
+          height: 3px;
+          background: rgba(255,255,255,0.08);
+          border-radius: 99px;
+          overflow: hidden;
+        }
+
+        .token-bar-fill {
+          height: 100%;
+          border-radius: 99px;
+          transition: width 0.25s ease, background 0.25s ease;
+        }
+
+        .token-state-label {
+          font-size: 0.65rem;
+          font-weight: 600;
+          transition: color 0.2s;
         }
 
         .reset-btn {
@@ -956,6 +1053,43 @@ export default function SketchLayoutWorkbench({
           display: flex;
           align-items: center;
           gap: 0.4rem;
+        }
+
+        .llm-launcher-group {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-sm);
+          padding: 0.15rem 0.35rem;
+          margin-right: 0.25rem;
+        }
+
+        .launcher-label {
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          margin-right: 0.15rem;
+        }
+
+        .btn-launcher {
+          background: transparent;
+          border: none;
+          color: var(--text-secondary);
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 0.15rem 0.35rem;
+          border-radius: 3px;
+          cursor: pointer;
+          transition: background var(--transition-fast), color var(--transition-fast);
+        }
+
+        .btn-launcher:hover {
+          background: var(--bg-surface);
+          color: #10B981;
         }
 
         .zap-icon {
