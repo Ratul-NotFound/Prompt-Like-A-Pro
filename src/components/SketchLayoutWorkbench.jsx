@@ -340,6 +340,12 @@ export default function SketchLayoutWorkbench({
             <div className="header-left">
               <Zap size={16} className="zap-icon" />
               <span className="response-title">Engineered Output ({selectedDomain.name})</span>
+              {enhancedResult.intent && (
+                <span className="intent-badge">{enhancedResult.intent}</span>
+              )}
+              {enhancedResult.archetype && (
+                <span className="archetype-badge">{enhancedResult.archetype}</span>
+              )}
             </div>
 
             <div className="view-mode-tabs">
@@ -355,19 +361,69 @@ export default function SketchLayoutWorkbench({
                 onClick={() => setViewMode('diff')}
               >
                 <Layers size={13} />
-                <span>Diff Layers</span>
+                <span>Analysis Layers</span>
               </button>
             </div>
           </div>
 
           <div className="response-body">
+            {/* ── Intent Intelligence Panel (local engine only) ── */}
+            {enhancedResult.intent && viewMode === 'formatted' && (
+              <div className="intent-intelligence-panel animate-fade-in">
+                <div className="iip-header">
+                  <Brain size={13} className="iip-brain-icon" />
+                  <span className="iip-title">What the engine understood</span>
+                </div>
+                <div className="iip-grid">
+                  <div className="iip-cell">
+                    <span className="iip-label">Intent</span>
+                    <span className="iip-value intent-val">{enhancedResult.intent}</span>
+                  </div>
+                  <div className="iip-cell">
+                    <span className="iip-label">Archetype</span>
+                    <span className="iip-value">{enhancedResult.archetype}</span>
+                  </div>
+                  <div className="iip-cell iip-cell-wide">
+                    <span className="iip-label">Inferred Goal</span>
+                    <span className="iip-value iip-goal">
+                      {enhancedResult.additions?.find(a => a.tag === 'Real Goal Inferred')?.text?.slice(0, 120)}
+                      {(enhancedResult.additions?.find(a => a.tag === 'Real Goal Inferred')?.text?.length || 0) > 120 ? '…' : ''}
+                    </span>
+                  </div>
+                  <div className="iip-cell iip-cell-wide">
+                    <span className="iip-label">Need-Gap Diagnosis</span>
+                    <span className="iip-value iip-need-gap">
+                      {enhancedResult.additions?.find(a => a.tag === 'Need Gap Diagnosed')?.text}
+                    </span>
+                  </div>
+                </div>
+                {/* Enhancement DNA pills */}
+                <div className="iip-dna-row">
+                  <span className="iip-dna-label">Enhancements applied:</span>
+                  <div className="iip-pills">
+                    {['Precision Persona','Smart Constraints','Deliverables','Success Criteria','Failure Guardrails'].map(tag => {
+                      const found = enhancedResult.additions?.find(a => a.tag === tag);
+                      if (!found) return null;
+                      return <span key={tag} className="iip-pill">✦ {tag}</span>;
+                    })}
+                    {enhancedResult.additions?.find(a => a.tag === 'Chain-of-Thought') && (
+                      <span className="iip-pill iip-pill-cot">🧠 Chain-of-Thought</span>
+                    )}
+                    {enhancedResult.additions?.find(a => a.tag === 'Context Boosters') && (
+                      <span className="iip-pill iip-pill-boost">💡 Context Boosters</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {viewMode === 'formatted' ? (
               <pre className="chatbot-code-display">{enhancedResult.enhancedText}</pre>
             ) : (
               <div className="diff-bubbles-list">
                 {enhancedResult.additions?.map((item, idx) => (
                   <div key={idx} className="diff-added">
-                    <span className="diff-tag">+{item.tag}</span>
+                    <span className="diff-tag">+ {item.tag}</span>
                     <pre className="diff-text">{item.text}</pre>
                   </div>
                 ))}
@@ -1099,6 +1155,177 @@ export default function SketchLayoutWorkbench({
 
         .btn-label-text {
           display: none;
+        }
+
+        /* ── Intent & Archetype badges in header ────────────────────────── */
+        .intent-badge {
+          font-size: 0.6rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          padding: 0.1rem 0.45rem;
+          border-radius: 4px;
+          background: rgba(139, 92, 246, 0.15);
+          color: #A78BFA;
+          border: 1px solid rgba(139, 92, 246, 0.3);
+          margin-left: 0.5rem;
+        }
+
+        .archetype-badge {
+          font-size: 0.6rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          padding: 0.1rem 0.45rem;
+          border-radius: 4px;
+          background: rgba(16, 185, 129, 0.1);
+          color: #34D399;
+          border: 1px solid rgba(16, 185, 129, 0.25);
+          margin-left: 0.3rem;
+        }
+
+        /* ── Intent Intelligence Panel ─────────────────────────────────── */
+        .intent-intelligence-panel {
+          background: rgba(139, 92, 246, 0.04);
+          border: 1px solid rgba(139, 92, 246, 0.18);
+          border-radius: var(--radius-md);
+          padding: 0.75rem 1rem;
+          margin-bottom: 0.85rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.65rem;
+        }
+
+        .iip-header {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .iip-brain-icon {
+          color: #A78BFA;
+          flex-shrink: 0;
+        }
+
+        .iip-title {
+          font-size: 0.7rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #A78BFA;
+        }
+
+        .iip-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.5rem;
+        }
+
+        .iip-cell {
+          display: flex;
+          flex-direction: column;
+          gap: 0.15rem;
+        }
+
+        .iip-cell-wide {
+          grid-column: 1 / -1;
+        }
+
+        .iip-label {
+          font-size: 0.6rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-muted);
+        }
+
+        .iip-value {
+          font-size: 0.75rem;
+          color: var(--text-secondary);
+          line-height: 1.4;
+        }
+
+        .intent-val {
+          color: #A78BFA;
+          font-weight: 700;
+          font-size: 0.8rem;
+        }
+
+        .iip-goal {
+          color: var(--text-primary);
+          font-size: 0.72rem;
+        }
+
+        .iip-need-gap {
+          color: #34D399;
+          font-size: 0.7rem;
+          font-style: italic;
+        }
+
+        .iip-dna-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.6rem;
+          flex-wrap: wrap;
+          padding-top: 0.3rem;
+          border-top: 1px solid rgba(139, 92, 246, 0.12);
+        }
+
+        .iip-dna-label {
+          font-size: 0.6rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: var(--text-muted);
+          white-space: nowrap;
+          padding-top: 0.15rem;
+        }
+
+        .iip-pills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+
+        .iip-pill {
+          font-size: 0.62rem;
+          font-weight: 600;
+          padding: 0.12rem 0.4rem;
+          border-radius: 4px;
+          background: rgba(139, 92, 246, 0.1);
+          color: #C4B5FD;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          transition: background 0.15s;
+        }
+
+        .iip-pill-cot {
+          background: rgba(251, 191, 36, 0.1);
+          color: #FCD34D;
+          border-color: rgba(251, 191, 36, 0.2);
+        }
+
+        .iip-pill-boost {
+          background: rgba(16, 185, 129, 0.1);
+          color: #34D399;
+          border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        /* Diff tag spacing */
+        .diff-added {
+          background: rgba(16, 185, 129, 0.04);
+          border: 1px solid rgba(16, 185, 129, 0.12);
+          border-radius: var(--radius-sm);
+          padding: 0.55rem 0.75rem;
+        }
+
+        .diff-tag {
+          display: inline-block;
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: #10B981;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          margin-bottom: 0.35rem;
         }
 
         @keyframes spin {
