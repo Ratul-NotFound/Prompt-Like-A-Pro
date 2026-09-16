@@ -81,7 +81,7 @@ export default function App() {
       let resultObj = null;
 
       try {
-        const apiResponse = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel);
+        const apiResponse = await enhancePromptWithGemini(rawInput, selectedDomain, apiKey, selectedModel, tunerSettings);
         resultObj = {
           enhancedText: apiResponse.text,
           additions: [

@@ -27,14 +27,91 @@ const MAX_OUTPUT_TOKENS   = 700;   // Room for verified, complete precision prom
 const TEMPERATURE         = 0.72;  // More creative synthesis, still controlled
 
 /**
- * 5-STAGE DEEP REASONING SCAFFOLD
- * ─────────────────────────────────
- * Guides the AI through the exact mental process a world-class prompt
- * engineer uses. Each stage is a tight directive (~50t each).
- * Total ~280t — 160t more than before, but produces 10x better outputs.
- * Still free-tier safe on Gemini Flash (1M tokens/day).
+ * Build the mode-specific output format directive.
+ * This is the key differentiator for hackathon use cases.
  */
-function buildSystemInstruction(domain) {
+function buildPromptModeDirective(promptMode, targetAI) {
+  const modeDirectives = {
+    system_prompt: `
+OUTPUT FORMAT — SYSTEM PROMPT:
+Structure your output using these exact blocks:
+[IDENTITY] What the AI is and its core purpose.
+[CAPABILITIES] What it can and cannot do.
+[BEHAVIOR RULES] How it should respond, tone, and style.
+[GUARDRAILS] Hard limits it must never cross.
+[OUTPUT FORMAT] How every response should be structured.
+Each block: 2-5 bullet points. Strict, unambiguous, imperative language.`,
+
+    few_shot: `
+OUTPUT FORMAT — FEW-SHOT TEMPLATE:
+Structure your output exactly as:
+Task: [one-sentence task description]
+Format: [description of expected output structure]
+
+Example 1:
+Input: [example input]
+Output: [ideal output for that input]
+
+Example 2:
+Input: [example input]
+Output: [ideal output for that input]
+
+Example 3:
+Input: [example input]
+Output: [ideal output for that input]
+
+---
+Now complete:
+Input: {{USER_INPUT}}
+Output:`,
+
+    chain_of_thought: `
+OUTPUT FORMAT — CHAIN-OF-THOUGHT:
+Structure your output so the AI must reason step-by-step:
+1. Begin with: "Let me think through this step by step."
+2. Include explicit numbered reasoning steps.
+3. End with: "Therefore, my final answer is: [answer]"
+The prompt must force visible reasoning before any conclusion.`,
+
+    json_output: `
+OUTPUT FORMAT — JSON/STRUCTURED OUTPUT:
+Structure your output with:
+1. Clear instruction to return ONLY valid JSON (no prose, no explanation).
+2. The exact JSON schema with field names, types, and descriptions.
+3. An example of valid output.
+4. A fallback instruction: "If any field is unknown, use null."
+The prompt must be parseable — zero ambiguity about schema.`,
+
+    user_turn: `
+OUTPUT FORMAT — USER TURN:
+Write a single, direct user message. No system-level instructions.
+Start from the user's perspective. Include enough context for the AI to respond correctly.
+Write in first person. Be specific about what you want, the format you expect, and any constraints.`,
+
+    universal: ''
+  };
+
+  const targetHints = {
+    chatgpt:      '\nTARGET AI: ChatGPT/GPT-4o — use conversational tone, can use markdown headers, works well with role-play.',
+    claude:       '\nTARGET AI: Claude — use <task>, <context>, <instructions> XML tags for clarity. Claude handles long context well.',
+    gemini:       '\nTARGET AI: Gemini — structured sections, code-aware. Gemini responds well to explicit step instructions.',
+    midjourney:   '\nTARGET AI: Midjourney — Output must be a pure image prompt: subject, style, camera, lighting, --ar, --v flags. No conversational language.',
+    coding_agent: '\nTARGET AI: Coding Agent (Cursor/Copilot) — ultra-precise spec. Include file paths, function signatures, edge cases, no ambiguity.',
+    perplexity:   '\nTARGET AI: Perplexity — frame as a research question. Request specific sources, date ranges, or citation format if relevant.',
+    universal:    ''
+  };
+
+  const modeDirective = modeDirectives[promptMode] || '';
+  const targetHint    = targetHints[targetAI] || '';
+  return modeDirective + targetHint;
+}
+
+/**
+ * System instruction — 6-stage reasoning scaffold + mode-aware format directive.
+ * Token budget: ~320-380t depending on mode. Still free-tier safe on Gemini Flash.
+ */
+function buildSystemInstruction(domain, promptMode = 'universal', targetAI = 'universal') {
+  const modeSection = buildPromptModeDirective(promptMode, targetAI);
   return `You are a world-class AI Prompt Engineer. Domain: "${domain.name}" (${domain.category}). Specialist lens: ${domain.defaultRole || 'expert practitioner'}.
 
 REASONING (internal, never output):
@@ -43,7 +120,7 @@ STAGE 2 — DIAGNOSE: What do they *actually need*? The stated request is almost
 STAGE 3 — GAP-FILL: What critical elements are missing from their draft? Audit for absent: expert persona, target audience, output format, scope boundaries, quality criteria, failure guardrails, and implicit context. These gaps cause AI to produce mediocre outputs.
 STAGE 4 — TARGET: Who or what will execute this prompt? (ChatGPT for writing/reasoning, Claude for analysis/long-form, Gemini for code/multimodal, Midjourney for visuals, an autonomous agent for tasks, a specialized tool). Optimize prompt structure and language for that executor.
 STAGE 5 — SYNTHESIZE: Write the engineered prompt. It must: (a) open with a precise, credentialed expert persona assignment; (b) state the REAL objective with all diagnosed context embedded — not the surface request; (c) define exact deliverables with success criteria; (d) include hard constraints that pre-empt the top 3 failure modes for this request type; (e) specify output format, length, and structure explicitly.
-STAGE 6 — VERIFY (self-critique before outputting): Check your synthesized prompt against these 5 gates: ① Does it assign a specific expert persona? ② Does it state the REAL goal (not the surface request)? ③ Does it define what a good output looks like? ④ Does it have at least 2 hard constraints? ⑤ Does it specify output format? If any gate fails, revise the prompt before outputting.
+STAGE 6 — VERIFY (self-critique before outputting): Check your synthesized prompt against these 5 gates: ① Does it assign a specific expert persona? ② Does it state the REAL goal (not the surface request)? ③ Does it define what a good output looks like? ④ Does it have at least 2 hard constraints? ⑤ Does it specify output format? If any gate fails, revise the prompt before outputting.${modeSection}
 
 OUTPUT RULES:
 - Output ONLY the final verified prompt. Zero preamble. Zero explanation. Zero meta-commentary.
@@ -70,10 +147,14 @@ function trimRawInput(rawPrompt) {
  * Enriched user message — gives the AI more signal to work with
  * without significantly increasing token count.
  */
-function buildUserMessage(rawPrompt, domain) {
+function buildUserMessage(rawPrompt, domain, tunerSettings = {}) {
   const safe = trimRawInput(rawPrompt);
-  const domainHint = domain ? ` [Domain: ${domain.name}, Category: ${domain.category}]` : '';
-  return `User's raw draft${domainHint}:\n"${safe}"\n\nApply your 5-stage reasoning. Output only the engineered prompt:`;
+  const domainHint   = domain ? ` [Domain: ${domain.name}, Category: ${domain.category}]` : '';
+  const targetAIHint = tunerSettings.targetAI && tunerSettings.targetAI !== 'universal'
+    ? ` [Target AI: ${tunerSettings.targetAI}]` : '';
+  const modeHint     = tunerSettings.promptMode && tunerSettings.promptMode !== 'universal'
+    ? ` [Prompt Mode: ${tunerSettings.promptMode}]` : '';
+  return `User's raw draft${domainHint}${targetAIHint}${modeHint}:\n"${safe}"\n\nApply your 6-stage reasoning. Output only the engineered prompt:`;
 }
 
 // ─── Token estimation helper ──────────────────────────────────────────────────
@@ -81,9 +162,9 @@ function estimateTokens(str) {
   return Math.ceil((str || '').length / 4);
 }
 
-export function getTotalRequestTokenEstimate(rawPrompt, domain) {
-  const sysTokens = estimateTokens(buildSystemInstruction(domain));
-  const userTokens = estimateTokens(buildUserMessage(rawPrompt, domain));
+export function getTotalRequestTokenEstimate(rawPrompt, domain, tunerSettings = {}) {
+  const sysTokens  = estimateTokens(buildSystemInstruction(domain, tunerSettings.promptMode, tunerSettings.targetAI));
+  const userTokens = estimateTokens(buildUserMessage(rawPrompt, domain, tunerSettings));
   return { sysTokens, userTokens, total: sysTokens + userTokens };
 }
 
@@ -93,11 +174,11 @@ const parseKeys = (val) => {
   return val.split(',').map(k => k.trim()).filter(Boolean);
 };
 
-export async function runMultiProviderEnhance(rawPrompt, domain, targetModel = 'gemini-2.5-flash', env = {}) {
+export async function runMultiProviderEnhance(rawPrompt, domain, targetModel = 'gemini-2.5-flash', env = {}, tunerSettings = {}) {
   const errors = [];
 
-  const systemInstruction = buildSystemInstruction(domain);
-  const userMessage = buildUserMessage(rawPrompt, domain);
+  const systemInstruction = buildSystemInstruction(domain, tunerSettings.promptMode, tunerSettings.targetAI);
+  const userMessage       = buildUserMessage(rawPrompt, domain, tunerSettings);
 
   // Log token usage for monitoring
   const { sysTokens, userTokens, total } = getTotalRequestTokenEstimate(rawPrompt, domain);

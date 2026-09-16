@@ -13,6 +13,46 @@ const ROLE_PRESETS = [
   { label: 'Business Analyst', value: 'Senior Business Analyst with expertise in data-driven decision making' },
 ];
 
+// Prompt Mode — tells the engine what FORMAT the output should take
+const PROMPT_MODES = [
+  {
+    value: 'universal',
+    label: 'Universal',
+    emoji: '✦',
+    desc: 'Clean, direct prompt usable with any AI tool',
+  },
+  {
+    value: 'system_prompt',
+    label: 'System Prompt',
+    emoji: '⚙️',
+    desc: 'Role, identity, guardrails — for AI agents & custom GPTs',
+  },
+  {
+    value: 'user_turn',
+    label: 'User Turn',
+    emoji: '💬',
+    desc: 'Single user message in a conversation',
+  },
+  {
+    value: 'few_shot',
+    label: 'Few-Shot',
+    emoji: '📎',
+    desc: 'Input→output examples for in-context learning',
+  },
+  {
+    value: 'chain_of_thought',
+    label: 'Chain-of-Thought',
+    emoji: '🧠',
+    desc: 'Forces step-by-step reasoning before the final answer',
+  },
+  {
+    value: 'json_output',
+    label: 'JSON / Structured',
+    emoji: '{}',
+    desc: 'Schema-enforced structured output (JSON, XML, typed)',
+  },
+];
+
 // Target AI tool presets — changes output structure
 const TARGET_AI_OPTIONS = [
   { label: 'Any AI (Universal)', value: 'universal' },
@@ -43,10 +83,13 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
   const format     = settings.format     || selectedDomain.frameworkDefaults?.format     || '';
   const context    = settings.context    || '';
   const targetAI   = settings.targetAI   || 'universal';
+  const promptMode = settings.promptMode || 'universal';
   const useCoT     = settings.useCoT !== false;
 
-  const activeCount = [role, tone, audience, format, context, targetAI !== 'universal' ? targetAI : '']
-    .filter(Boolean).length;
+  const activeCount = [role, tone, audience, format, context,
+    targetAI !== 'universal' ? targetAI : '',
+    promptMode !== 'universal' ? promptMode : ''
+  ].filter(Boolean).length;
 
   return (
     <div className="costar-tuner-container glass-card">
@@ -93,6 +136,34 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
               ))}
             </div>
             <p className="target-ai-hint-text">{TARGET_AI_HINTS[targetAI]}</p>
+          </div>
+
+          {/* Prompt Mode Selector */}
+          <div className="target-ai-section">
+            <div className="section-label-row">
+              <Zap size={13} className="section-icon" />
+              <span className="section-label">Prompt Mode</span>
+              <span className="section-hint">What type of prompt do you want to engineer?</span>
+            </div>
+            <div className="prompt-mode-grid">
+              {PROMPT_MODES.map(mode => (
+                <button
+                  key={mode.value}
+                  type="button"
+                  className={`prompt-mode-btn ${promptMode === mode.value ? 'selected' : ''}`}
+                  onClick={() => onChangeSettings({ ...settings, promptMode: mode.value })}
+                  title={mode.desc}
+                >
+                  <span className="pm-emoji">{mode.emoji}</span>
+                  <span className="pm-label">{mode.label}</span>
+                </button>
+              ))}
+            </div>
+            {promptMode !== 'universal' && (
+              <p className="target-ai-hint-text">
+                {PROMPT_MODES.find(m => m.value === promptMode)?.desc}
+              </p>
+            )}
           </div>
 
           <div className="tuner-divider" />
@@ -311,6 +382,57 @@ export default function COStarTuner({ settings, onChangeSettings, selectedDomain
           border-color: var(--border-medium);
           color: var(--text-primary);
           background: var(--bg-surface-hover);
+        }
+
+        .iip-pill-boost {
+          background: rgba(16, 185, 129, 0.1);
+          color: #34D399;
+          border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        /* ── Prompt Mode Grid ───────────────────────────────────────────── */
+        .prompt-mode-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+
+        .prompt-mode-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.3rem 0.65rem;
+          border-radius: 6px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          border: 1px solid var(--border-subtle);
+          background: var(--bg-surface);
+          color: var(--text-secondary);
+          cursor: pointer;
+          transition: all 0.15s ease;
+          white-space: nowrap;
+        }
+
+        .prompt-mode-btn:hover {
+          border-color: var(--border-medium);
+          color: var(--text-primary);
+          background: var(--bg-surface-hover);
+        }
+
+        .prompt-mode-btn.selected {
+          background: rgba(251, 191, 36, 0.1);
+          border-color: rgba(251, 191, 36, 0.35);
+          color: #FCD34D;
+        }
+
+        .pm-emoji {
+          font-size: 0.8rem;
+          line-height: 1;
+        }
+
+        .pm-label {
+          font-size: 0.7rem;
+          font-weight: 700;
         }
 
         .target-ai-btn.selected {

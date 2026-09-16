@@ -596,6 +596,81 @@ export const DOMAINS = [
       'Build a RAG system prompt that instructs the AI to only answer from provided context and cite sources.',
       'Design a query decomposition prompt that breaks complex questions into sub-queries for a vector DB.'
     ]
+  },
+  {
+    id: 'ai-chain',
+    name: 'LLM Chain & Pipeline Design',
+    category: 'AI Systems',
+    icon: 'Workflow',
+    badge: 'Chains',
+    color: '#FAFAFA',
+    description: 'Engineer multi-step LLM chains, prompt pipelines, conditional routing logic, and memory management patterns.',
+    defaultRole: 'Senior LLM Engineer specializing in LangChain, LlamaIndex, and multi-step reasoning pipelines',
+    frameworkDefaults: { tone: 'Deterministic, Structured, Traceable', audience: 'LLM pipeline runtime and AI developers', format: 'Step-by-step chain definition with input/output schema and error handling per step' },
+    examples: [
+      'Design a 3-step LLM chain: extract entities → classify intent → generate response with memory.',
+      'Build a conditional routing prompt that directs queries to the right specialist agent based on topic.'
+    ]
+  },
+  {
+    id: 'ai-structured-output',
+    name: 'Structured Output & JSON Mode',
+    category: 'AI Systems',
+    icon: 'Code',
+    badge: 'JSON',
+    color: '#FAFAFA',
+    description: 'Craft prompts that force LLMs to output valid, schema-compliant JSON, XML, or typed structured data reliably.',
+    defaultRole: 'Principal LLM Engineer specializing in structured output, JSON schema enforcement, and reliable data extraction',
+    frameworkDefaults: { tone: 'Strict, Schema-Compliant, Zero-Ambiguity', audience: 'LLM runtime with JSON mode or function calling', format: 'JSON schema definition + prompt instruction + validation rules + fallback handling' },
+    examples: [
+      'Write a prompt that reliably extracts product name, price, and category from unstructured text as JSON.',
+      'Build a structured output prompt for an AI to return a task plan as a typed JSON array with priority fields.'
+    ]
+  },
+  {
+    id: 'ai-multimodal',
+    name: 'Multimodal AI Prompts',
+    category: 'AI Systems',
+    icon: 'Layers',
+    badge: 'Vision',
+    color: '#FAFAFA',
+    description: 'Engineer prompts for vision-language models (GPT-4V, Gemini, Claude Vision) that analyze images, charts, UI screenshots.',
+    defaultRole: 'Senior Multimodal AI Engineer specializing in vision-language model prompting and image understanding',
+    frameworkDefaults: { tone: 'Precise, Perceptual, Detail-Oriented', audience: 'Vision-language model runtime (GPT-4V, Gemini, Claude)', format: 'Task directive + what to look for + output schema + confidence instruction' },
+    examples: [
+      'Write a prompt for GPT-4V to analyze a UI screenshot and extract all interactive elements as JSON.',
+      'Create a vision prompt that compares two product images and returns a structured difference report.'
+    ]
+  },
+  {
+    id: 'ai-eval-redteam',
+    name: 'AI Evaluation & Red-Teaming',
+    category: 'AI Systems',
+    icon: 'ShieldCheck',
+    badge: 'Eval',
+    color: '#FAFAFA',
+    description: 'Design evaluation prompts, LLM-as-judge rubrics, adversarial test cases, and jailbreak resistance probes.',
+    defaultRole: 'AI Safety Researcher & LLM Evaluation Specialist with expertise in red-teaming and model robustness testing',
+    frameworkDefaults: { tone: 'Adversarial, Rigorous, Safety-Focused', audience: 'AI evaluation pipeline and safety testers', format: 'Rubric: Criteria | Score 1-5 | Pass/Fail | Evidence | Recommendation' },
+    examples: [
+      'Create an LLM-as-judge prompt that scores AI responses on accuracy, helpfulness, and safety on a 1-5 rubric.',
+      'Write 5 adversarial red-team prompts to test if an AI customer support bot leaks confidential information.'
+    ]
+  },
+  {
+    id: 'ai-few-shot',
+    name: 'Few-Shot Prompt Engineering',
+    category: 'AI Systems',
+    icon: 'Zap',
+    badge: 'Few-Shot',
+    color: '#FAFAFA',
+    description: 'Design high-quality few-shot examples, in-context learning demonstrations, and chain-of-thought example sets.',
+    defaultRole: 'Expert Few-Shot Prompt Engineer specializing in in-context learning and example selection strategies',
+    frameworkDefaults: { tone: 'Demonstrative, Consistent, Pattern-Clear', audience: 'LLM runtime using in-context learning', format: 'Task description + 3 input→output examples + new input + expected output format' },
+    examples: [
+      'Build a 3-shot prompt that teaches an LLM to classify customer sentiment as Positive/Negative/Neutral.',
+      'Create a few-shot chain-of-thought prompt for solving multi-step math word problems step by step.'
+    ]
   }
 ];
 
@@ -607,5 +682,5 @@ export const CATEGORIES = [
   { id: 'Business',   name: 'Business & Career' },
   { id: 'Daily Life', name: 'Daily Life & Productivity' },
   { id: 'Visuals',    name: 'Creative & Visuals' },
-  { id: 'AI Systems', name: 'AI & Agents' }
+  { id: 'AI Systems', name: 'AI & Agents 🏆' }
 ];

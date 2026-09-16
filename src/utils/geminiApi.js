@@ -25,39 +25,60 @@ const MAX_OUTPUT_TOKENS   = 700;   // Room for verified, complete precision prom
 const TEMPERATURE         = 0.72;  // Creative synthesis, still controlled
 
 /**
- * 5-STAGE DEEP REASONING SCAFFOLD
- * ─────────────────────────────────
- * Mirrors the backend scaffold exactly. Guides the AI through the exact
- * mental process a world-class prompt engineer uses.
- * ~280t — 160t more than before, but produces 10x better outputs.
- * Still free-tier safe on Gemini Flash (1M tokens/day).
+ * Mode-specific format directive — mirrors backend logic exactly.
  */
-function buildSystemInstruction(domain) {
+function buildPromptModeDirective(promptMode, targetAI) {
+  const modeDirectives = {
+    system_prompt: `\nOUTPUT FORMAT — SYSTEM PROMPT:\nUse blocks: [IDENTITY] [CAPABILITIES] [BEHAVIOR RULES] [GUARDRAILS] [OUTPUT FORMAT]. Each: 2-5 bullets. Strict, imperative.`,
+    few_shot: `\nOUTPUT FORMAT — FEW-SHOT:\nTask: [description]\nExample 1: Input: [...] Output: [...]\nExample 2: Input: [...] Output: [...]\nExample 3: Input: [...] Output: [...]\n---\nInput: {{USER_INPUT}}\nOutput:`,
+    chain_of_thought: `\nOUTPUT FORMAT — CHAIN-OF-THOUGHT:\nPrompt must instruct: start with "Let me think step by step", show numbered reasoning, end with "Therefore: [answer]".`,
+    json_output: `\nOUTPUT FORMAT — JSON:\nReturn ONLY valid JSON. Include schema, field types, example, and fallback null instruction.`,
+    user_turn: `\nOUTPUT FORMAT — USER TURN:\nWrite a single user message in first person. No system-level language. Specific, contextual, format-specified.`,
+    universal: ''
+  };
+  const targetHints = {
+    chatgpt:      '\nTARGET: ChatGPT/GPT-4o — conversational, markdown, role-play friendly.',
+    claude:       '\nTARGET: Claude — use <task>, <context>, <instructions> XML tags.',
+    gemini:       '\nTARGET: Gemini — structured sections, code-aware, explicit step instructions.',
+    midjourney:   '\nTARGET: Midjourney — pure image prompt: subject, style, camera, lighting, --ar --v flags.',
+    coding_agent: '\nTARGET: Coding Agent — ultra-precise spec, file paths, function signatures, zero ambiguity.',
+    perplexity:   '\nTARGET: Perplexity — research framing, request sources and citation format.',
+    universal:    ''
+  };
+  return (modeDirectives[promptMode] || '') + (targetHints[targetAI] || '');
+}
+
+/**
+ * System instruction — 6-stage scaffold + mode-aware format directive.
+ */
+function buildSystemInstruction(domain, promptMode = 'universal', targetAI = 'universal') {
+  const modeSection = buildPromptModeDirective(promptMode, targetAI);
   return `You are a world-class AI Prompt Engineer. Domain: "${domain.name}" (${domain.category}). Specialist lens: ${domain.defaultRole || 'expert practitioner'}.
 
 REASONING (internal, never output):
-STAGE 1 — DECONSTRUCT: What did the user actually write? Strip filler words and noise. Extract the core verbs, nouns, and intent signals. What is the literal stated request?
-STAGE 2 — DIAGNOSE: What do they *actually need*? The stated request is almost always a proxy for a deeper goal. Identify: the real desired outcome, the actual problem being solved, who benefits, and what success looks like.
-STAGE 3 — GAP-FILL: What critical elements are missing from their draft? Audit for absent: expert persona, target audience, output format, scope boundaries, quality criteria, failure guardrails, and implicit context. These gaps cause AI to produce mediocre outputs.
-STAGE 4 — TARGET: Who or what will execute this prompt? (ChatGPT for writing/reasoning, Claude for analysis/long-form, Gemini for code/multimodal, Midjourney for visuals, an autonomous agent for tasks, a specialized tool). Optimize prompt structure and language for that executor.
-STAGE 5 — SYNTHESIZE: Write the engineered prompt. It must: (a) open with a precise, credentialed expert persona assignment; (b) state the REAL objective with all diagnosed context embedded — not the surface request; (c) define exact deliverables with success criteria; (d) include hard constraints that pre-empt the top 3 failure modes for this request type; (e) specify output format, length, and structure explicitly.
-STAGE 6 — VERIFY (self-critique before outputting): Check your synthesized prompt against these 5 gates: ① Does it assign a specific expert persona? ② Does it state the REAL goal (not the surface request)? ③ Does it define what a good output looks like? ④ Does it have at least 2 hard constraints? ⑤ Does it specify output format? If any gate fails, revise the prompt before outputting.
+STAGE 1 — DECONSTRUCT: Strip filler. Extract core verbs, nouns, intent signals.
+STAGE 2 — DIAGNOSE: Identify the REAL goal behind the stated request. Who benefits? What does success look like?
+STAGE 3 — GAP-FILL: Audit for absent: persona, audience, format, constraints, guardrails, context.
+STAGE 4 — TARGET: Who executes this prompt? Optimize structure for that executor.
+STAGE 5 — SYNTHESIZE: Specific persona + real objective + exact deliverables + hard constraints + explicit format.
+STAGE 6 — VERIFY: 5 gates: \u2460 specific persona? \u2461 real goal? \u2462 success defined? \u2463 2+ constraints? \u2464 format specified? Revise if any fail.${modeSection}
 
 OUTPUT RULES:
-- Output ONLY the final verified prompt. Zero preamble. Zero explanation. Zero meta-commentary.
-- 150–300 words. Dense, specific, unambiguous — not a template with blanks.
-- Do NOT execute the task. Engineer the prompt that extracts the best possible result from any AI.
-- Start directly with the persona assignment or the core directive. No soft openers.`;
+- Output ONLY the final verified prompt. Zero preamble. Zero meta-commentary.
+- 150\u2013300 words. Dense, unambiguous. Do NOT execute the task.
+- Start with persona or core directive. No soft openers.`;
 }
 
 /**
  * Enriched user message — gives the AI domain context as extra signal.
  * Minimal token cost, significant quality improvement.
  */
-function buildUserMessage(rawPrompt, domain) {
+function buildUserMessage(rawPrompt, domain, tunerSettings = {}) {
   const safe = trimRawInput(rawPrompt);
-  const domainHint = domain ? ` [Domain: ${domain.name}, Category: ${domain.category}]` : '';
-  return `User's raw draft${domainHint}:\n"${safe}"\n\nApply your 5-stage reasoning. Output only the engineered prompt:`;
+  const domainHint   = domain ? ` [Domain: ${domain.name}, Category: ${domain.category}]` : '';
+  const targetAIHint = tunerSettings.targetAI && tunerSettings.targetAI !== 'universal' ? ` [Target AI: ${tunerSettings.targetAI}]` : '';
+  const modeHint     = tunerSettings.promptMode && tunerSettings.promptMode !== 'universal' ? ` [Prompt Mode: ${tunerSettings.promptMode}]` : '';
+  return `User's raw draft${domainHint}${targetAIHint}${modeHint}:\n"${safe}"\n\nApply your 6-stage reasoning. Output only the engineered prompt:`;
 }
 
 function trimRawInput(rawPrompt) {
@@ -70,9 +91,9 @@ function trimRawInput(rawPrompt) {
     : cut + '… [trimmed]';
 }
 
-export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-2.5-flash') {
+export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model = 'gemini-2.5-flash', tunerSettings = {}) {
   if (apiKey && apiKey.trim()) {
-    return await queryGoogleDirectly(rawPrompt, domain, apiKey, model);
+    return await queryGoogleDirectly(rawPrompt, domain, apiKey, model, tunerSettings);
   }
 
   // Route through secure backend proxy
@@ -80,7 +101,7 @@ export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model =
     const response = await fetch('/api/enhance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rawPrompt, domain, model })
+      body: JSON.stringify({ rawPrompt, domain, model, tunerSettings })
     });
 
     if (!response.ok) {
@@ -95,12 +116,12 @@ export async function enhancePromptWithGemini(rawPrompt, domain, apiKey, model =
   }
 }
 
-async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel) {
+async function queryGoogleDirectly(rawPrompt, domain, apiKey, targetModel, tunerSettings = {}) {
   const startIndex = Math.max(0, GEMINI_MODEL_FALLBACKS.indexOf(targetModel));
   const modelsToTry = GEMINI_MODEL_FALLBACKS.slice(startIndex);
 
-  const systemInstruction = buildSystemInstruction(domain);
-  const userMessage = buildUserMessage(rawPrompt, domain);
+  const systemInstruction = buildSystemInstruction(domain, tunerSettings.promptMode, tunerSettings.targetAI);
+  const userMessage       = buildUserMessage(rawPrompt, domain, tunerSettings);
 
   let lastError = null;
 
