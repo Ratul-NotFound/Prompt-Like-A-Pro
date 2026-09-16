@@ -92,7 +92,8 @@ export default function App() {
           ],
           variables: extractVariables(apiResponse.text),
           tokenCount: Math.ceil(apiResponse.text.length / 4),
-          rawTokenCount: Math.ceil(rawInput.length / 4)
+          rawTokenCount: Math.ceil(rawInput.length / 4),
+          rawInputSnapshot: rawInput,
         };
 
         if (apiResponse.fallbackUsed) {
@@ -102,7 +103,8 @@ export default function App() {
         }
       } catch (apiErr) {
         console.warn('Gemini Live API failed. Falling back to local heuristics:', apiErr);
-        resultObj = enhancePrompt(rawInput, selectedDomain, tunerSettings);
+        const localResult = enhancePrompt(rawInput, selectedDomain, tunerSettings);
+        resultObj = { ...localResult, rawInputSnapshot: rawInput };
         showToast('Live API failed. Automatically fell back to Local Heuristic Engine.', 'warning');
       }
 

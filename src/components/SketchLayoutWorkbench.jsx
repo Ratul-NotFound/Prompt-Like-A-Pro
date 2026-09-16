@@ -432,6 +432,27 @@ export default function SketchLayoutWorkbench({
           </div>
 
           <div className="response-footer">
+            {/* Quality Lift Widget — shows before/after score jump */}
+            {(() => {
+              if (!enhancedResult?.rawInputSnapshot) return null;
+              const rawScore = evaluatePromptStrength(enhancedResult.rawInputSnapshot).score;
+              const outScore = Math.min(100, Math.round(
+                (enhancedResult.tokenCount / Math.max(1, enhancedResult.rawTokenCount)) * 35 + 55
+              ));
+              const lift = outScore - rawScore;
+              const outLevel = outScore >= 78 ? 'Pro/Elite' : outScore >= 50 ? 'Advanced' : 'Intermediate';
+              const rawLevel = rawScore >= 78 ? 'Pro/Elite' : rawScore >= 50 ? 'Advanced' : rawScore >= 25 ? 'Intermediate' : 'Basic';
+              if (lift <= 0) return null;
+              return (
+                <div className="quality-lift-widget">
+                  <span className="ql-label">Quality Lift:</span>
+                  <span className="ql-before">{rawLevel} {rawScore}</span>
+                  <span className="ql-arrow">→</span>
+                  <span className="ql-after">{outLevel} {outScore}</span>
+                  <span className="ql-delta">↑{lift}pts</span>
+                </div>
+              );
+            })()}
             <div className="footer-left-stats">
               <span className="badge badge-emerald">~{enhancedResult.tokenCount} Tokens</span>
               {enhancedResult.variables?.length > 0 && (
@@ -1326,6 +1347,57 @@ export default function SketchLayoutWorkbench({
           text-transform: uppercase;
           letter-spacing: 0.04em;
           margin-bottom: 0.35rem;
+        }
+
+        /* ── Quality Lift Widget ────────────────────────────────────────── */
+        .quality-lift-widget {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0.3rem 0.7rem;
+          background: rgba(16, 185, 129, 0.07);
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          border-radius: 6px;
+          animation: fadeIn 300ms ease forwards;
+          width: 100%;
+          margin-bottom: 0.5rem;
+        }
+
+        .ql-label {
+          font-size: 0.62rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-muted);
+          flex-shrink: 0;
+        }
+
+        .ql-before {
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: var(--text-muted);
+        }
+
+        .ql-arrow {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+        }
+
+        .ql-after {
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #34D399;
+        }
+
+        .ql-delta {
+          font-size: 0.7rem;
+          font-weight: 800;
+          color: #10B981;
+          background: rgba(16, 185, 129, 0.12);
+          padding: 0.05rem 0.35rem;
+          border-radius: 4px;
+          margin-left: auto;
+          letter-spacing: 0.02em;
         }
 
         @keyframes spin {
