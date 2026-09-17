@@ -257,8 +257,7 @@ export default function SketchLayoutWorkbench({
          ========================================================================= */}
       <section className="chat-categories-section">
         <div className="categories-header-row">
-          <span className="categories-header-label">Scenario Blueprint:</span>
-          <span className="categories-header-desc">Click a category card to open subcategories dropdown menu.</span>
+          <span className="categories-header-label">Scenario Blueprint</span>
         </div>
 
         <div className="categories-grid">
@@ -543,15 +542,16 @@ export default function SketchLayoutWorkbench({
           background: var(--bg-surface);
           border: 1px solid var(--border-subtle);
           border-radius: 16px;
-          padding: 0.85rem 1rem 0.65rem 1rem;
+          padding: 0.9rem 1rem 0.6rem 1rem;
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
-          transition: border-color var(--transition-fast);
+          transition: border-color 200ms ease, box-shadow 200ms ease;
         }
 
         .chat-input-wrapper:focus-within {
-          border-color: #555;
+          border-color: rgba(99, 102, 241, 0.45);
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08), 0 4px 16px rgba(0,0,0,0.2);
         }
 
         .chat-textarea {
@@ -635,27 +635,42 @@ export default function SketchLayoutWorkbench({
         }
 
         .send-enhance-btn {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: var(--accent-primary);
-          border: none;
-          color: #000;
           display: flex;
           align-items: center;
-          justify-content: center;
+          gap: 0.4rem;
+          padding: 0 0.85rem;
+          height: 34px;
+          min-width: 34px;
+          border-radius: 10px;
+          background: var(--accent-primary);
+          border: none;
+          color: #fff;
+          font-family: var(--font-ui);
+          font-size: 0.75rem;
+          font-weight: 700;
           cursor: pointer;
-          transition: background var(--transition-fast);
+          transition: background 150ms ease, box-shadow 150ms ease, transform 80ms ease;
+          letter-spacing: 0.01em;
         }
 
-        .send-enhance-btn:hover {
+        .send-enhance-btn:hover:not(:disabled) {
           background: var(--accent-primary-hover);
+          box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .send-enhance-btn:active:not(:disabled) {
+          transform: translateY(0);
         }
 
         .send-enhance-btn:disabled {
-          background: #2F2F2F;
+          background: rgba(255,255,255,0.06);
           color: var(--text-muted);
           cursor: not-allowed;
+        }
+
+        .btn-label-text {
+          font-size: 0.72rem;
         }
 
         .chat-spinner {
@@ -708,14 +723,17 @@ export default function SketchLayoutWorkbench({
 
         .strength-progress-bg {
           width: 100%;
-          height: 2px;
-          background: var(--bg-subtle);
+          height: 3px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 99px;
           overflow: hidden;
         }
 
         .strength-progress-bar {
           height: 100%;
-          transition: width 0.3s cubic-bezier(0.2, 0, 0, 1), background-color 0.3s;
+          border-radius: 99px;
+          background: linear-gradient(90deg, #6366F1, #818CF8);
+          transition: width 0.4s cubic-bezier(0.2, 0, 0, 1), background 0.3s;
         }
 
         .checks-list {
@@ -725,12 +743,13 @@ export default function SketchLayoutWorkbench({
         }
 
         .check-badge {
-          font-size: 0.65rem;
-          background: var(--bg-subtle);
-          border: 1px solid var(--border-subtle);
+          font-size: 0.63rem;
+          background: rgba(99, 102, 241, 0.07);
+          border: 1px solid rgba(99, 102, 241, 0.15);
           color: var(--text-secondary);
-          padding: 0.1rem 0.35rem;
-          border-radius: 3px;
+          padding: 0.08rem 0.4rem;
+          border-radius: 4px;
+          font-weight: 500;
         }
 
         /* Suggestion Starters Grid (ChatGPT-Style Suggestions) */
@@ -756,26 +775,28 @@ export default function SketchLayoutWorkbench({
         .suggestion-deck-card {
           background: var(--bg-surface);
           border: 1px solid var(--border-subtle);
-          border-radius: 12px;
-          padding: 0.65rem 0.85rem;
+          border-radius: 10px;
+          padding: 0.6rem 0.8rem;
           text-align: left;
           cursor: pointer;
-          transition: background var(--transition-fast), border-color var(--transition-fast);
+          transition: background 150ms ease, border-color 150ms ease, transform 100ms ease;
         }
 
         .suggestion-deck-card:hover {
           background: var(--bg-surface-hover);
           border-color: var(--border-medium);
+          transform: translateY(-1px);
         }
 
         .suggestion-card-text {
-          font-size: 0.775rem;
+          font-size: 0.75rem;
           color: var(--text-secondary);
-          line-height: 1.35;
+          line-height: 1.4;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          font-style: italic;
         }
 
         /* Categories Blueprint Section */
@@ -806,8 +827,8 @@ export default function SketchLayoutWorkbench({
 
         .categories-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-          gap: 0.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 0.45rem;
         }
 
         .category-suggestion-wrapper {
@@ -818,22 +839,30 @@ export default function SketchLayoutWorkbench({
           width: 100%;
           background: var(--bg-surface);
           border: 1px solid var(--border-subtle);
-          border-radius: 12px;
-          padding: 0.65rem 0.85rem;
+          border-radius: 10px;
+          padding: 0.6rem 0.75rem;
           display: flex;
           align-items: center;
           justify-content: space-between;
           cursor: pointer;
           color: var(--text-secondary);
-          transition: all var(--transition-fast);
+          transition: background 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
         }
 
         .category-suggestion-btn:hover {
           background: var(--bg-surface-hover);
+          border-color: var(--border-medium);
           color: var(--text-primary);
         }
 
         .category-suggestion-btn.active-parent {
+          border-color: rgba(99, 102, 241, 0.4);
+          color: var(--text-primary);
+          background: rgba(99, 102, 241, 0.06);
+          box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.1);
+        }
+
+        .category-suggestion-btn.open {
           border-color: var(--border-medium);
           color: var(--text-primary);
         }
@@ -844,8 +873,19 @@ export default function SketchLayoutWorkbench({
           gap: 0.4rem;
         }
 
+        .cat-label {
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+        }
+
         .cat-icon {
           color: var(--text-muted);
+          flex-shrink: 0;
+        }
+
+        .category-suggestion-btn.active-parent .cat-icon {
+          color: #818CF8;
         }
 
         .chevron-arrow {
@@ -868,9 +908,9 @@ export default function SketchLayoutWorkbench({
         }
 
         .category-suggestion-btn.active-parent .cat-count {
-          background: rgba(16, 185, 129, 0.15);
-          color: #10B981;
-          border-color: rgba(16, 185, 129, 0.3);
+          background: rgba(99, 102, 241, 0.12);
+          color: #818CF8;
+          border-color: rgba(99, 102, 241, 0.25);
         }
 
         /* Subcategories Popover */
@@ -883,10 +923,10 @@ export default function SketchLayoutWorkbench({
           z-index: 999;
           background: var(--bg-surface);
           border: 1px solid var(--border-medium);
-          border-radius: var(--radius-md);
-          padding: 0.6rem;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(12px);
+          border-radius: 12px;
+          padding: 0.5rem;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.04);
+          backdrop-filter: blur(16px);
         }
 
         .popover-header-bar {
